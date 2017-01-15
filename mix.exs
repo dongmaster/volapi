@@ -7,7 +7,16 @@ defmodule Volapi.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+
+     # docs
+     name: "Volapi",
+     source_url: "https://github.com/dongmaster/volapi",
+     homepage_url: "https://github.com/dongmaster/volapi",
+     docs: [main: "Volapi", # The main page in the docs
+            #logo: "path/to/logo.png",
+            extras: ["README.md"]]
+    ]
   end
 
   # Configuration for the OTP application
@@ -32,6 +41,7 @@ defmodule Volapi.Mixfile do
       {:websocket_client, git: "https://github.com/sanmiguel/websocket_client"},
       {:poison, "~> 3.0"},
       {:httpoison, "~> 0.10.0"},
+      {:ex_doc, "~> 0.14.5", only: :dev}
     ]
   end
 end

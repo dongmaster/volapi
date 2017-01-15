@@ -123,18 +123,7 @@ defmodule Volapi.Client.Receiver do
     # ["DJQOpzggEshW", "lains list.jpg", "image", 289288, 1483826588110, 1483740188110, %{"user" => "Heisenb3rg"}, ["thumb", "preview", "gallery"]]
     #[[file_id, file_name, "image", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] | t]
     Enum.map(files, fn
-      [file_id, file_name, "image", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] ->
-        %Volapi.File.Image
-        {
-          file_id: file_id,
-          file_name: file_name,
-          file_size: file_size,
-          file_expiration_time: file_expiration_time,
-          file_life_time: file_life_time,
-          metadata: %{user: uploader}
-        }
-
-      [file_id, file_name, "audio", file_size, file_expiration_time, file_life_time, metadata, _] ->
+      [file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _] ->
         metadata =
           case metadata do
             %{"user" => uploader, "artist" => artist, "album" => album} ->
@@ -149,59 +138,18 @@ defmodule Volapi.Client.Receiver do
               %{user: "", artist: "", album: ""}
           end
 
-        %Volapi.File.Audio
+        %Volapi.File
         {
           file_id: file_id,
           file_name: file_name,
+          file_type: file_type,
           file_size: file_size,
           file_expiration_time: file_expiration_time,
           file_life_time: file_life_time,
           metadata: metadata,
         }
-
-      [file_id, file_name, "video", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] ->
-        %Volapi.File.Video
-        {
-          file_id: file_id,
-          file_name: file_name,
-          file_size: file_size,
-          file_expiration_time: file_expiration_time,
-          file_life_time: file_life_time,
-          metadata: %{user: uploader},
-        }
-
-      [file_id, file_name, "archive", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] ->
-        %Volapi.File.Archive
-        {
-          file_id: file_id,
-          file_name: file_name,
-          file_size: file_size,
-          file_expiration_time: file_expiration_time,
-          file_life_time: file_life_time,
-          metadata: %{user: uploader},
-        }
-
-      [file_id, file_name, "book", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] ->
-        %Volapi.File.Archive
-      {
-        file_id: file_id,
-        file_name: file_name,
-        file_size: file_size,
-        file_expiration_time: file_expiration_time,
-        file_life_time: file_life_time,
-        metadata: %{user: uploader},
-      }
-
-      [file_id, file_name, "other", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] ->
-        %Volapi.File.Other
-      {
-        file_id: file_id,
-        file_name: file_name,
-        file_size: file_size,
-        file_expiration_time: file_expiration_time,
-        file_life_time: file_life_time,
-        metadata: %{user: uploader},
-      }
+      _ ->
+        %Volapi.File{}
     end)
   end
 end

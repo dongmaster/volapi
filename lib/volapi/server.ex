@@ -1,5 +1,6 @@
 defmodule Volapi.Server do
   use GenServer
+  alias Volapi.Server.Util
   defstruct [
     user_count: 0,
     client_ack: 0,
@@ -53,6 +54,8 @@ defmodule Volapi.Server do
   # User count
 
   def set_user_count(user_count) do
+    Util.cast(:user_count, user_count)
+
     GenServer.call(__MODULE__, {:set_user_count, user_count})
   end
 
@@ -63,33 +66,12 @@ defmodule Volapi.Server do
   # Files
 
   def add_file(file) do
-    spawn(fn ->
-      try do
-        Enum.each(:pg2.get_members(:modules), fn(member) ->
-          GenServer.cast(member, {:file, file})
-        end)
-      rescue
-        _ ->
-          ""
-      end
-    end)
-
+    Util.cast(:file, file)
     GenServer.call(__MODULE__, {:add_file, file})
   end
 
   def add_files(files) do
-    spawn(fn ->
-      try do
-        Enum.each(:pg2.get_members(:modules), fn(member) ->
-          Enum.each(files, fn(file) ->
-            GenServer.cast(member, {:file, file})
-          end)
-        end)
-      rescue
-        _ ->
-          ""
-      end
-    end)
+    Util.cast_list(:file, files)
 
     GenServer.call(__MODULE__, {:add_files, files})
   end
@@ -99,10 +81,14 @@ defmodule Volapi.Server do
   end
 
   def del_file(file) do
+    Util.cast(:file_delete, file)
+
     GenServer.call(__MODULE__, {:del_file, file})
   end
 
   def del_files(files) do
+    Util.cast_list(:file_delete, files)
+
     Enum.each(files, fn(x) ->
       GenServer.call(__MODULE__, {:del_file, x})
     end)
@@ -111,16 +97,8 @@ defmodule Volapi.Server do
   # Chat messages
 
   def add_message(message) do
-    spawn(fn ->
-      try do
-        Enum.each(:pg2.get_members(:modules), fn(member) ->
-          GenServer.cast(member, {:msg, message})
-        end)
-      rescue
-        _ ->
-          ""
-      end
-    end)
+    Util.cast(:msg, message)
+
     GenServer.call(__MODULE__, {:add_message, message})
   end
 
@@ -141,16 +119,7 @@ defmodule Volapi.Server do
   # Timeouts
 
   def add_timeout(message) do
-    spawn(fn ->
-      try do
-        Enum.each(:pg2.get_members(:modules), fn(member) ->
-          GenServer.cast(member, {:timeout, message})
-        end)
-      rescue
-        _ ->
-          ""
-      end
-    end)
+    Util.cast(:timeout, message)
 
     GenServer.call(__MODULE__, {:add_timeout, message})
   end
@@ -158,6 +127,10 @@ defmodule Volapi.Server do
   def get_timeouts() do
     GenServer.call(__MODULE__, :get_timeouts)
   end
+
+
+
+
 
   ## Server API
 
@@ -276,10 +249,8 @@ defmodule Volapi.Server do
 
   # Timeouts
 
-  def handle_call({:add_timeout, id, name, date}, _from, state) do
+  def handle_call({:add_timeout, timeout}, _from, state) do
     timeouts_state = Map.get(state, :timeouts)
-
-    timeout = %Volapi.Timeout{id: id, name: name, date: date}
 
     new_timeouts = [timeout | timeouts_state]
 
