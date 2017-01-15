@@ -101,6 +101,9 @@ defmodule Volapi.Client.Receiver do
   end
 
   def parse([[[_, ["showTimeoutList", timeouts]], server_ack] | t]) do
+    Enum.each(timeouts, fn(%{"id" => id, "name" => name, "date" => date}) ->
+      Volapi.Server.add_timeout(%Volapi.Timeout{id: id, name: name, date: date})
+    end)
   end
 
   def parse([[h, server_ack] | t]) do

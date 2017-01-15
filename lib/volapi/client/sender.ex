@@ -63,6 +63,7 @@ defmodule Volapi.Client.Sender do
 
   @doc """
   `id` refers to the file_id key in any of the %Volapi.File.*{} structs.
+  It is only available to room owners.
   """
   def timeout_file(id, nick) do
     frame = ["call", %{"fn" => "timeoutFile", "args" => [id, nick]}]
@@ -70,6 +71,9 @@ defmodule Volapi.Client.Sender do
     gen_send(frame)
   end
 
+  @doc """
+  The id returned by this is always a chat id, so use `timeout_chat` on id's that come from this function.
+  """
   def get_timeouts() do
     frame = ["call", %{"fn" => "requestTimeoutList", "args" => []}]
 

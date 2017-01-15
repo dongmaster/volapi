@@ -140,8 +140,19 @@ defmodule Volapi.Server do
 
   # Timeouts
 
-  def add_timeout(id, name, date) do
-    GenServer.call(__MODULE__, {:add_timeout, id, name, date})
+  def add_timeout(message) do
+    spawn(fn ->
+      try do
+        Enum.each(:pg2.get_members(:modules), fn(member) ->
+          GenServer.cast(member, {:timeout, message})
+        end)
+      rescue
+        _ ->
+          ""
+      end
+    end)
+
+    GenServer.call(__MODULE__, {:add_timeout, message})
   end
 
   def get_timeouts() do
@@ -277,6 +288,7 @@ defmodule Volapi.Server do
   end
 
   def handle_call(:get_timeouts, _from, state) do
-    
+    timeouts = Map.get(state, :timeouts)
+    {:reply, timeouts, state}
   end
 end
