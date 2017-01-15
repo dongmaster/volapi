@@ -112,7 +112,17 @@ defmodule Volapi.Module do
         {:noreply, state}
       end
 
+      def handle_cast({:file_delete, message}, state) do
+        on_message(message)
+        {:noreply, state}
+      end
+
       def handle_cast({:timeout, message}, state) do
+        on_message(message)
+        {:noreply, state}
+      end
+
+      def handle_cast({:user_count, message}, state) do
         on_message(message)
         {:noreply, state}
       end
