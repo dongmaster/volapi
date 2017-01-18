@@ -10,8 +10,10 @@ defmodule Volapi do
     :ets.new(:modules, [:set, :named_table, :public, {:read_concurrency, true}, {:write_concurrency, true}])
 
     children = [
-      worker(Volapi.Server, []),
+      #worker(Volapi.Server, []),
       #worker(Volapi.WebSocket.Server, [url]),
+      supervisor(Volapi.Server.Supervisor, [])
+      supervisor(Volapi.WebSocket.Supervisor, []),
       supervisor(Volapi.Module.Supervisor, [[name: Volapi.Module.Supervisor]])
     ]
 

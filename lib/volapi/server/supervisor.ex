@@ -1,4 +1,4 @@
-defmodule Volapi.WebSocket.Supervisor do
+defmodule Volapi.Server.Supervisor do
   use Supervisor
 
   def start_link(opts \\ []) do
@@ -8,7 +8,7 @@ defmodule Volapi.WebSocket.Supervisor do
   def init(:ok) do
     #Logger.log :debug, "Starting modules!"
     rooms = Application.get_env(:volapi, :rooms)
-    |> Enum.map(fn(room) -> worker(Volapi.WebSocket.Server, [room]) end)
+    |> Enum.map(fn(room) -> worker(Volapi.Server, [room]) end)
     |> supervise(strategy: :one_for_one)
 
 
