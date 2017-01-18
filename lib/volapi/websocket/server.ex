@@ -7,12 +7,12 @@ defmodule Volapi.WebSocket.Server do
   def start_link(room) do
     url = generate_wss_url(@volafile_wss_url)
     {:ok, pid} = result = :websocket_client.start_link(url, __MODULE__, %{room: room})
-    :global.register_name(:volapi_server, pid)
+    :global.register_name("volapi_wss_" <> room, pid)
     result
   end
 
-  def volaping(ping_reply) do
-    :global.send(:volapi_server, {:volaping, Integer.to_string(ping_reply)})
+  def volaping(room, ping_reply) do
+    :global.send("volapi_wss_" <>, {:volaping, Integer.to_string(ping_reply)})
   end
 
   # There are two ack's.
