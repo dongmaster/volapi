@@ -1,4 +1,4 @@
-defmodule Volapi.Timeout do
+defmodule Volapi.Message.Timeout do
   defstruct [
     id: "",
     name: "",

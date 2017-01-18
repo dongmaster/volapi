@@ -1,10 +1,12 @@
 defmodule Volapi.WebSocket.Server do
   @behaviour :websocket_client
+  @volafile_wss_url "wss://volafile.io/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>"
 
   # Client API
 
-  def start_link(url) do
-    {:ok, pid} = result = :websocket_client.start_link(url, __MODULE__, %{})
+  def start_link(room) do
+    url = generate_wss_url(@volafile_wss_url)
+    {:ok, pid} = result = :websocket_client.start_link(url, __MODULE__, %{room: room})
     :global.register_name(:volapi_server, pid)
     result
   end
@@ -18,6 +20,13 @@ defmodule Volapi.WebSocket.Server do
   def reply(data) do
     :global.send(:volapi_server, {:text, {:reply, data}})
     :ok
+  end
+
+  def generate_wss_url(volafile_wss_url) do
+    rn = Volapi.Util.random_id(10)
+    t = Volapi.Util.random_id(7)
+
+    EEx.eval_string(volafile_wss_url, [rn: rn, t: t])
   end
 
   # Server API

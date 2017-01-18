@@ -67,10 +67,10 @@ defmodule Volapi.Client.Receiver do
   def parse([[[_, ["chat", %{"data" => data, "message" => message, "nick" => nick, "options" => options}]], server_ack] | t]) do
     Volapi.Server.set_ack(:server, server_ack)
 
-    msg = %Volapi.Chat
+    msg = %Volapi.Message.Chat
     {
       raw_message: message,
-      message: Volapi.Chat.raw_to_string(message),
+      message: Volapi.Message.Chat.raw_to_string(message),
       self: Map.get(data, "self", false),
       id: Map.get(data, "id", ""),
       ip: Map.get(data, "ip", ""),
@@ -116,7 +116,7 @@ defmodule Volapi.Client.Receiver do
 
   def parse([[[_, ["showTimeoutList", timeouts]], server_ack] | t]) do
     Enum.each(timeouts, fn(%{"id" => id, "name" => name, "date" => date}) ->
-      Volapi.Server.add_timeout(%Volapi.Timeout{id: id, name: name, date: date})
+      Volapi.Server.add_timeout(%Volapi.Message.Timeout{id: id, name: name, date: date})
     end)
     parse(t)
   end
@@ -134,9 +134,6 @@ defmodule Volapi.Client.Receiver do
   end
 
   def handle_file(files) do
-    #[file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _]
-    # ["DJQOpzggEshW", "lains list.jpg", "image", 289288, 1483826588110, 1483740188110, %{"user" => "Heisenb3rg"}, ["thumb", "preview", "gallery"]]
-    #[[file_id, file_name, "image", file_size, file_expiration_time, file_life_time, %{"user" => uploader}, _] | t]
     Enum.map(files, fn
       [file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _] ->
         metadata =
@@ -153,7 +150,7 @@ defmodule Volapi.Client.Receiver do
               %{user: "", artist: "", album: ""}
           end
 
-        %Volapi.File
+        %Volapi.Message.File
         {
           file_id: file_id,
           file_name: file_name,
@@ -164,7 +161,7 @@ defmodule Volapi.Client.Receiver do
           metadata: metadata,
         }
       _ ->
-        %Volapi.File{}
+        %Volapi.Message.File{}
     end)
   end
 end

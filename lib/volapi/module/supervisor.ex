@@ -4,7 +4,7 @@ defmodule Volapi.Module.Supervisor do
 
   @moduledoc """
   Module supervisor. It runs all modules specified in the :modules
-  configuration option for :kaguya.
+  configuration option for :volapi.
   """
 
   def start_link(opts \\ []) do
