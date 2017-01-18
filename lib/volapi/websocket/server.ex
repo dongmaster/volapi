@@ -6,20 +6,30 @@ defmodule Volapi.WebSocket.Server do
 
   def start_link(room) do
     url = generate_wss_url(@volafile_wss_url)
-    {:ok, pid} = result = :websocket_client.start_link(url, __MODULE__, %{room: room})
-    :global.register_name("volapi_wss_" <> room, pid)
+    result = {:ok, pid} = :websocket_client.start_link(url, __MODULE__, %{room: room})
+    :global.register_name(this(room), pid)
     result
   end
 
-  def volaping(room, ping_reply) do
-    :global.send("volapi_wss_" <>, {:volaping, Integer.to_string(ping_reply)})
+  def this(room) do
+    "volapi_wss_" <> room
+  end
+
+  def volaping(ping_reply, room) do
+    :global.send(this(room), {:volaping, Integer.to_string(ping_reply)})
   end
 
   # There are two ack's.
   # One is used for when the client (volapi) sends something and the other is used for when the server (volafile) sends something.
-  def reply(data) do
-    :global.send(:volapi_server, {:text, {:reply, data}})
+  def reply(data, room) do
+    :global.send(this(room), {:text, {:reply, data}})
     :ok
+  end
+
+  # Don't know which one is best for piping so I'm just creating a reverse function.
+  # rreply means reverse reply
+  def rreply(room, data) do
+    reply(room, data)
   end
 
   def generate_wss_url(volafile_wss_url) do
@@ -31,8 +41,8 @@ defmodule Volapi.WebSocket.Server do
 
   # Server API
 
-  def init(%{}) do
-    {:once, %{}}
+  def init(state) do
+    {:once, state}
   end
 
   def onconnect(wsreq, state) do
@@ -54,7 +64,7 @@ defmodule Volapi.WebSocket.Server do
     IO.puts "Received message from 0"
     IO.inspect data
 
-    Volapi.Client.Receiver.parse(Poison.decode(data))
+    Volapi.Client.Receiver.parse(Poison.decode(data), state.room)
     {:ok, state}
   end
 
@@ -62,7 +72,7 @@ defmodule Volapi.WebSocket.Server do
     IO.puts "Received message from 4"
     #IO.inspect data
 
-    Volapi.Client.Receiver.parse(Poison.decode(data))
+    Volapi.Client.Receiver.parse(Poison.decode(data), state.room)
     {:ok, state}
   end
 
@@ -85,7 +95,6 @@ defmodule Volapi.WebSocket.Server do
   # end
 
   def websocket_info({:volaping, ping_reply}, _conn_state, state) do
-    IO.puts "sending a volaping"
     {:reply, {:text, ping_reply}, state}
   end
 

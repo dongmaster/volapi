@@ -3,8 +3,9 @@ defmodule Volapi.Message.Chat do
   defstruct [
     raw_message: [],
     message: "", # Multi-part. Multiple parts can be witnessed when using newlines in a message and links.
+    room: "",
     nick: "",
-    nickd: "", # Convenience key. Useful for pattern matching.
+    nick_alt: "", # Convenience key. Useful for pattern matching. It's just the nick downcased.
     id: "", # For room owners. Used for timeouts.
     ip: "",
     channel: "",

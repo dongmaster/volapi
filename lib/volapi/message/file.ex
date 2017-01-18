@@ -7,5 +7,6 @@ defmodule Volapi.Message.File do
     file_expiration_time: 0, # UNIX timestamp
     file_life_time: 0, # UNIX timestamp
     metadata: %{user: "", artist: "", album: ""}, # user is uploader
+    room: "",
   ]
 end

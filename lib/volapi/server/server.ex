@@ -22,123 +22,21 @@ defmodule Volapi.Server do
   @chat_limit 300
 
   ## Client API
+  # The actual Client API is in Volapi.Server.Client
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  def start_link(room) do
+    GenServer.start_link(__MODULE__, room, name: {:global, "volapi_server_" <> room})
   end
-
-  # Ack
-
-  def set_ack(:server, ack) do
-    GenServer.call(__MODULE__, {:set_ack, {:server_ack, ack}})
-  end
-
-  def set_ack(:client, ack) do
-    GenServer.call(__MODULE__, {:set_ack, {:client_ack, ack}})
-  end
-
-  def get_ack(:server) do
-    GenServer.call(__MODULE__, {:get_ack, :server_ack})
-  end
-
-  def get_ack(:client) do
-    GenServer.call(__MODULE__, {:get_ack, :client_ack})
-  end
-
-  # Get State
-
-  def get_state() do
-    GenServer.call(__MODULE__, :get_state)
-  end
-
-  # User count
-
-  def set_user_count(user_count) do
-    Util.cast(:user_count, user_count)
-
-    GenServer.call(__MODULE__, {:set_user_count, user_count})
-  end
-
-  def get_user_count() do
-    GenServer.call(__MODULE__, :get_user_count)
-  end
-
-  # Files
-
-  def add_file(file) do
-    Util.cast(:file, file)
-    GenServer.call(__MODULE__, {:add_file, file})
-  end
-
-  def add_files(files) do
-    Util.cast_list(:file, files)
-
-    GenServer.call(__MODULE__, {:add_files, files})
-  end
-
-  def get_files() do
-    GenServer.call(__MODULE__, :get_files)
-  end
-
-  def del_file(file) do
-    Util.cast(:file_delete, file)
-
-    GenServer.call(__MODULE__, {:del_file, file})
-  end
-
-  def del_files(files) do
-    Util.cast_list(:file_delete, files)
-
-    Enum.each(files, fn(x) ->
-      GenServer.call(__MODULE__, {:del_file, x})
-    end)
-  end
-
-  # Chat messages
-
-  def add_message(message) do
-    Util.cast(:msg, message)
-
-    GenServer.call(__MODULE__, {:add_message, message})
-  end
-
-  def get_messages() do
-    GenServer.call(__MODULE__, :get_messages)
-  end
-
-  # Config
-
-  def set_config(key, value) do
-    GenServer.call(__MODULE__, {:set_state_custom, key, value})
-  end
-
-  def get_config(key) do
-    GenServer.call(__MODULE__, {:get_state_custom, key})
-  end
-
-  # Timeouts
-
-  def add_timeout(message) do
-    Util.cast(:timeout, message)
-
-    GenServer.call(__MODULE__, {:add_timeout, message})
-  end
-
-  def get_timeouts() do
-    GenServer.call(__MODULE__, :get_timeouts)
-  end
-
-
-
-
 
   ## Server API
 
-  def init(state) do
+  def init(room) do
     state = %__MODULE__{}
+
     spawn(fn ->
-      Volapi.Room.populate_config(Application.get_env(:volapi, :room))
+      Volapi.Room.populate_config(room)
     end)
+
     {:ok, state}
   end
 

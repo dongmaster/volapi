@@ -83,17 +83,6 @@ defmodule Volapi.Module do
 
       defoverridable on_message: 1
 
-      defp get_name_from_message(message) do
-        case message do
-          %Volapi.Chat{} ->
-            message.message
-          %Volapi.File{} ->
-            message.file_name
-          %Volapi.Timeout{} ->
-            message.name
-        end
-      end
-
       # Used to scan for valid modules on start
       defmodule Volapi_Module do
       end
@@ -265,7 +254,7 @@ defmodule Volapi.Module do
 
   defp add_re_matcher(body, re) do
     quote do
-      m = get_name_from_message(var!(message))
+      m = Volapi.Util.get_text_from_message(var!(message))
       case Regex.named_captures(unquote(re), m) do
         nil -> :ok
         res -> unquote(body)
@@ -431,7 +420,7 @@ defmodule Volapi.Module do
   defp add_captures(body, match_str, match_group) do
     re = match_str |> extract_vars(match_group) |> Macro.escape
     quote do
-      m = get_name_from_message(var!(message))
+      m = Volapi.Util.get_text_from_message(var!(message))
       case Regex.named_captures(unquote(re), m) do
         nil ->
           :ok

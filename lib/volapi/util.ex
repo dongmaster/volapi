@@ -37,7 +37,7 @@ defmodule Volapi.Util do
     config
   end
 
-  def login do
+  def login(room) do
     HTTPoison.start
 
     nick = Application.get_env(:volapi, :nick)
@@ -53,13 +53,26 @@ defmodule Volapi.Util do
         %{"error" => %{"code" => code, "message" => message}} ->
           {:error, "Couldn't login because of: #{message}"}
         %{"session" => session} ->
-          Volapi.Client.Sender.login(session)
+          Volapi.Client.Sender.login(session, room)
         lol ->
           IO.inspect lol
           {:error, "Couldn't pattern match on the /rest/login response."}
       end
     else
       {:error, "There is no password key in the config.exs file."}
+    end
+  end
+
+  defp get_text_from_message(message) do
+    case message do
+      %Volapi.Message.Chat{} ->
+        message.message
+      %Volapi.Message.File{} ->
+        message.file_name
+      %Volapi.Message.Timeout{} ->
+        message.name
+      %Volapi.Message.UserCount{} ->
+        message.user_count
     end
   end
 end

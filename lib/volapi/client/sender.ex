@@ -3,10 +3,10 @@ defmodule Volapi.Client.Sender do
   @doc """
   Generic function for sending frames using the Volapi.WebSocket.Server
   """
-  def gen_send(frame) do
+  def gen_send(frame, room) do
     {:ok, data} = gen_build(frame) |> Poison.encode
 
-    Volapi.WebSocket.Server.reply(data)
+    Volapi.WebSocket.Server.reply(data, room)
   end
 
   @doc """
@@ -29,7 +29,7 @@ defmodule Volapi.Client.Sender do
     [server_ack, [[0, frame], client_ack]]
   end
 
-  def subscribe(room, nick) do
+  def subscribe(nick, room) do
     checksum = Volapi.Util.get_checksum()
 
     frame = ["subscribe", %{"nick" => nick, "room" => room, "checksum" => checksum, "checksum2" => checksum}]
@@ -37,52 +37,55 @@ defmodule Volapi.Client.Sender do
     gen_send(frame)
   end
 
-  def send_message(message) do
+  def send_message(message, room) do
     nick = Application.get_env(:volapi, :nick)
-
-    frame = ["call", %{"args" => [nick, message], "fn" => "chat"}]
-
-    gen_send(frame)
+    send_message(message, nick, room)
   end
 
-  def login(session) do
+  def send_message(message, nick, room) do
+    frame = ["call", %{"args" => [nick, message], "fn" => "chat"}]
+
+    gen_send(frame, room)
+  end
+
+  def login(session, room) do
     frame = ["call", %{"fn" => "useSession", "args" => [session]}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
   @doc """
   `id` refers to the id key in the %Volapi.Chat{} struct.
   It is only available to room owners.
   """
-  def timeout_chat(id, nick) do
+  def timeout_chat(id, nick, room) do
     frame = ["call", %{"fn" => "timeoutChat", "args" => [id, nick]}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
   @doc """
   `id` refers to the file_id key in any of the %Volapi.File.*{} structs.
   It is only available to room owners.
   """
-  def timeout_file(id, nick) do
+  def timeout_file(id, nick, room) do
     frame = ["call", %{"fn" => "timeoutFile", "args" => [id, nick]}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
   @doc """
   The id returned by this is always a chat id, so use `timeout_chat` on id's that come from this function.
   """
-  def get_timeouts() do
+  def get_timeouts(room) do
     frame = ["call", %{"fn" => "requestTimeoutList", "args" => []}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
-  def ban_user(ip, ban_opts) do
+  def ban_user(ip, ban_opts, room) do
     frame = ["call", %{"fn" => "banUser", "args" => [ip, ban_opts]}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 end

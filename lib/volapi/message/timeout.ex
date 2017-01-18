@@ -3,5 +3,6 @@ defmodule Volapi.Message.Timeout do
     id: "",
     name: "",
     date: 0,
+    room: "",
   ]
 end
