@@ -20,7 +20,7 @@ defmodule Volapi.Room do
               value
           end
 
-        Volapi.Server.set_config(String.to_atom(key), value)
+        Volapi.Server.Client.set_config(String.to_atom(key), value, room)
       end
     end)
   end

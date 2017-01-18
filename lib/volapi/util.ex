@@ -63,7 +63,7 @@ defmodule Volapi.Util do
     end
   end
 
-  defp get_text_from_message(message) do
+  def get_text_from_message(message) do
     case message do
       %Volapi.Message.Chat{} ->
         message.message

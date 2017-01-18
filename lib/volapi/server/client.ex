@@ -1,4 +1,5 @@
 defmodule Volapi.Server.Client do
+  alias Volapi.Server.Util
   ## Client API
 
   #def start_link(room) do

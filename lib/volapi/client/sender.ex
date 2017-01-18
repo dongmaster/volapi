@@ -4,8 +4,9 @@ defmodule Volapi.Client.Sender do
   Generic function for sending frames using the Volapi.WebSocket.Server
   """
   def gen_send(frame, room) do
-    {:ok, data} = gen_build(frame) |> Poison.encode
+    {:ok, data} = gen_build(frame, room) |> Poison.encode
 
+    IO.puts "HEYO"
     Volapi.WebSocket.Server.reply(data, room)
   end
 
@@ -13,8 +14,8 @@ defmodule Volapi.Client.Sender do
   Convenience function for building your own frames.
   Adds 1 to the client_ack automatically.
   """
-  def gen_build(frame) do
-    gen_build(frame, 1)
+  def gen_build(frame, room) do
+    gen_build(frame, 1, room)
   end
 
   @doc """
@@ -23,9 +24,9 @@ defmodule Volapi.Client.Sender do
 
   Be wary when using this so you don't set a wrong client_ack.
   """
-  def gen_build(frame, client_ack_offset) do
-    server_ack = Volapi.Server.get_ack(:server)
-    client_ack = Volapi.Server.get_ack(:client) + client_ack_offset
+  def gen_build(frame, client_ack_offset, room) do
+    server_ack = Volapi.Server.Client.get_ack(:server, room)
+    client_ack = Volapi.Server.Client.get_ack(:client, room) + client_ack_offset
     [server_ack, [[0, frame], client_ack]]
   end
 
@@ -34,7 +35,7 @@ defmodule Volapi.Client.Sender do
 
     frame = ["subscribe", %{"nick" => nick, "room" => room, "checksum" => checksum, "checksum2" => checksum}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
   def send_message(message, room) do

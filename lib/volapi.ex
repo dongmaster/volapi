@@ -12,7 +12,7 @@ defmodule Volapi do
     children = [
       #worker(Volapi.Server, []),
       #worker(Volapi.WebSocket.Server, [url]),
-      supervisor(Volapi.Server.Supervisor, [])
+      supervisor(Volapi.Server.Supervisor, []),
       supervisor(Volapi.WebSocket.Supervisor, []),
       supervisor(Volapi.Module.Supervisor, [[name: Volapi.Module.Supervisor]])
     ]

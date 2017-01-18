@@ -19,6 +19,7 @@ defmodule Volapi.Client.Receiver do
   """
   def parse({:ok, %{"version" => version, "session" => session, "ack" => ack}}, room) do
     Volapi.Server.Client.set_ack(:server, ack, room)
+    IO.puts "HELLO"
     Volapi.Client.Sender.subscribe(Application.get_env(:volapi, :nick), room)
   end
 
@@ -96,9 +97,9 @@ defmodule Volapi.Client.Receiver do
   def parse([[[_, ["subscribed", _]], server_ack] | t], room) do
     Volapi.Server.Client.set_ack(:server, server_ack, room)
 
-    Volapi.Server.Client.Util.cast(:connect, %Volapi.Message.Connected{connected: true, room: room})
+    Volapi.Server.Util.cast(:connect, %Volapi.Message.Connected{connected: true, room: room})
 
-    if Application.get_env(:volapi, :password, nil) and Application.get_env(:volapi, :auto_login, false) == true do
+    if Application.get_env(:volapi, :password, nil) != nil and Application.get_env(:volapi, :auto_login, false) == true do
       Volapi.Util.login(room)
     end
 
@@ -106,24 +107,24 @@ defmodule Volapi.Client.Receiver do
   end
 
   def parse([[[_, ["login", name]], server_ack] | t], room) do
-    Volapi.Server.Client.Util.cast(:login, name)
+    Volapi.Server.Util.cast(:login, name)
     parse(t, room)
   end
 
   def parse([[[_, ["owner", %{"owner" => owner}]], server_ack] | t], room) do
-    Volapi.Server.Client.Util.cast(:is_owner, owner)
+    Volapi.Server.Util.cast(:is_owner, owner)
     parse(t, room)
   end
 
   def parse([[[_, ["showTimeoutList", timeouts]], server_ack] | t], room) do
     Enum.each(timeouts, fn(%{"id" => id, "name" => name, "date" => date}) ->
-      Volapi.Server.Client.add_timeout(%Volapi.Message.Timeout{id: id, name: name, date: date})
+      Volapi.Server.Client.add_timeout(%Volapi.Message.Timeout{id: id, name: name, date: date}, room)
     end)
     parse(t, room)
   end
 
   def parse([[h, server_ack] | t], room) do
-    Volapi.Server.Client.set_ack(:server, server_ack)
+    Volapi.Server.Client.set_ack(:server, server_ack, room)
     IO.puts("Ignoring the following frame:")
     IO.inspect h
     IO.puts("Ignoring the above frame.")
@@ -131,7 +132,7 @@ defmodule Volapi.Client.Receiver do
   end
 
   def ping(room) do
-    Volapi.WebSocket.Server.volaping(2)
+    Volapi.WebSocket.Server.volaping(2, room)
   end
 
   def handle_file(files) do

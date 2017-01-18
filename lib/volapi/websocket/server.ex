@@ -52,7 +52,7 @@ defmodule Volapi.WebSocket.Server do
 
   def ondisconnect({:remote, :closed}, state) do
     IO.inspect "Disconnected! State: "
-    IO.inspect Volapi.Server.get_state
+    IO.inspect Volapi.Server.Client.get_state(state.room)
     {:reconnect, state}
   end
 
@@ -70,7 +70,7 @@ defmodule Volapi.WebSocket.Server do
 
   def websocket_handle({:text, << "4" :: binary, data :: binary >>}, _conn_state, state) do
     IO.puts "Received message from 4"
-    #IO.inspect data
+    IO.inspect data
 
     Volapi.Client.Receiver.parse(Poison.decode(data), state.room)
     {:ok, state}

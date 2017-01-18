@@ -132,7 +132,7 @@ defmodule Volapi.Module do
   """
   defmacro handle("chat", do: body) do
     quote do
-      def handle_cast({:msg, %Volapi.Chat{} = var!(message)}, state) do
+      def handle_cast({:msg, %Volapi.Message.Chat{} = var!(message)}, state) do
         on_message(var!(message))
         unquote(body)
         {:noreply, state}
@@ -142,7 +142,7 @@ defmodule Volapi.Module do
 
   defmacro handle("file", do: body) do
     quote do
-      def handle_cast({:file, %Volapi.File{} = var!(message)}, state) do
+      def handle_cast({:file, %Volapi.Message.File{} = var!(message)}, state) do
         on_message(var!(message))
         unquote(body)
         {:noreply, state}
@@ -162,7 +162,7 @@ defmodule Volapi.Module do
 
   defmacro handle("timeout", do: body) do
     quote do
-      def handle_cast({:timeout, %Volapi.Timeout{} = var!(message)}, state) do
+      def handle_cast({:timeout, %Volapi.Message.Timeout{} = var!(message)}, state) do
         on_message(var!(message))
         unquote(body)
         {:noreply, state}

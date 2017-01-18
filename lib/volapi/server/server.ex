@@ -1,6 +1,5 @@
 defmodule Volapi.Server do
   use GenServer
-  alias Volapi.Server.Util
   defstruct [
     user_count: 0,
     client_ack: 0,
