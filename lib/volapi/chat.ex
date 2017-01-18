@@ -1,4 +1,4 @@
-defmodule Volapi.Chat do
+defmodule Volapi.Message.Chat do
   # There's a data key in message maps that contains data such as if a message is sent by you (self: true) or IP addresses
   defstruct [
     raw_message: [],

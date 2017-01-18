@@ -1,4 +1,4 @@
-defmodule Volapi.File do
+defmodule Volapi.Message.File do
   defstruct [
     file_id: "",
     file_name: "",

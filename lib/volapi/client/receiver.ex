@@ -95,15 +95,30 @@ defmodule Volapi.Client.Receiver do
   def parse([[[_, ["subscribed", _]], server_ack] | t]) do
     Volapi.Server.set_ack(:server, server_ack)
 
+    Volapi.Server.Util.cast(:connect, true)
+
     if Application.get_env(:volapi, :password, nil) do
       Volapi.Util.login
     end
+
+    parse(t)
+  end
+
+  def parse([[[_, ["login", name]], server_ack] | t]) do
+    Volapi.Server.Util.cast(:login, name)
+    parse(t)
+  end
+
+  def parse([[[_, ["owner", %{"owner" => owner}]], server_ack] | t]) do
+    Volapi.Server.Util.cast(:is_owner, owner)
+    parse(t)
   end
 
   def parse([[[_, ["showTimeoutList", timeouts]], server_ack] | t]) do
     Enum.each(timeouts, fn(%{"id" => id, "name" => name, "date" => date}) ->
       Volapi.Server.add_timeout(%Volapi.Timeout{id: id, name: name, date: date})
     end)
+    parse(t)
   end
 
   def parse([[h, server_ack] | t]) do

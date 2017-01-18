@@ -102,27 +102,7 @@ defmodule Volapi.Module do
 
   defmacro __before_compile__(env) do
     quote do
-      def handle_cast({:msg, message}, state) do
-        on_message(message)
-        {:noreply, state}
-      end
-
-      def handle_cast({:file, message}, state) do
-        on_message(message)
-        {:noreply, state}
-      end
-
-      def handle_cast({:file_delete, message}, state) do
-        on_message(message)
-        {:noreply, state}
-      end
-
-      def handle_cast({:timeout, message}, state) do
-        on_message(message)
-        {:noreply, state}
-      end
-
-      def handle_cast({:user_count, message}, state) do
+      def handle_cast({_, message}, state) do
         on_message(message)
         {:noreply, state}
       end
@@ -157,6 +137,9 @@ defmodule Volapi.Module do
   - file_delete
   - timeout
   - user_count
+  - login
+  - is_owner
+  - connect
   """
   defmacro handle("chat", do: body) do
     quote do
@@ -201,6 +184,36 @@ defmodule Volapi.Module do
   defmacro handle("user_count", do: body) do
     quote do
       def handle_cast({:user_count, var!(message)}, state) do
+        on_message(var!(message))
+        unquote(body)
+        {:noreply, state}
+      end
+    end
+  end
+
+  defmacro handle("login", do: body) do
+    quote do
+      def handle_cast({:login, var!(message)}, state) do
+        on_message(var!(message))
+        unquote(body)
+        {:noreply, state}
+      end
+    end
+  end
+
+  defmacro handle("is_owner", do: body) do
+    quote do
+      def handle_cast({:is_owner, var!(message)}, state) do
+        on_message(var!(message))
+        unquote(body)
+        {:noreply, state}
+      end
+    end
+  end
+
+  defmacro handle("connect", do: body) do
+    quote do
+      def handle_cast({:connect, var!(message)}, state) do
         on_message(var!(message))
         unquote(body)
         {:noreply, state}
