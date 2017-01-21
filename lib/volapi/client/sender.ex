@@ -43,26 +43,20 @@ defmodule Volapi.Client.Sender do
     send_message(message, nick, room)
   end
 
-  def send_message(message, me: true, room) do
+  def send_message(message, :me, room) do
     nick = Application.get_env(:volapi, :nick)
 
     frame = ["call", %{"fn" => "command", "args" => [nick, "me", message]}]
 
-    gen_send(frame)
+    gen_send(frame, room)
   end
 
-  def send_message(message, admin: true, room) do
+  def send_message(message, :admin, room) do
     nick = Application.get_env(:volapi, :nick)
 
-    frame = ["call", %{"fn" => "command", "args" => [nick, "me", message]}]
+    frame = ["call", %{"fn" => "command", "args" => [nick, "a", message]}]
 
-    gen_send(frame)
-  end
-
-  def send_message(message, opts, room) when opts == admin: false or opts == me: false do
-    nick = Application.get_env(:volapi, :nick)
-
-    send_message("I'm a dumb faggot that can't use Volapi correctly. Please rape my face. (Stop using admin: false and me: false with send_message)", nick, room)
+    gen_send(frame, room)
   end
 
   def send_message(message, nick, room) do
