@@ -25,12 +25,13 @@ defmodule Volapi.Module do
       import Volapi.Module
 
       @module_name module_name
+      @task_table String.to_atom("#{@module_name}_tasks")
       @before_compile Volapi.Module
 
       init_attrs()
 
       def start_link(opts \\ []) do
-        {:ok, _pid} = GenServer.start_link(__MODULE__, :ok, [])
+        {:ok, _pid} = GenServer.start_link(__MODULE__, :ok, opts)
       end
 
       defoverridable start_link: 1
@@ -40,6 +41,7 @@ defmodule Volapi.Module do
         Logger.log :debug, "Started module #{@module_name}!"
         :pg2.join(:modules, self)
         :ets.insert(:modules, {@module_name, self})
+        :ets.new(@task_table, [:set, :public, :named_table, {:read_concurrency, true}, {:write_concurrency, true}])
         Process.register(self, __MODULE__)
         module_init()
         {:ok, []}
@@ -574,30 +576,30 @@ defmodule Volapi.Module do
   """
   defmacro reply(response) do
     quote do
-      #recip = get_recip(var!(message))
-      Volapi.Client.Sender.send_message(response)
+      room = var!(message).room
+      Volapi.Client.Sender.send_message(response, room)
     end
   end
 
   @doc """
   Sends a response to the sender of the PRIVMSG with a given message via a private message.
-  Example: `reply_priv "Hi"`
+  Example: `reply_me "Hi"`
   """
   defmacro reply_me(response) do
     quote do
-      #recip = Map.get(var!(message).user, :nick)
-      Volapi.Client.Sender.send_message(response, me: true)
+      room = var!(message).room
+      Volapi.Client.Sender.send_message(response, me: true, room)
     end
   end
 
   @doc """
   Sends a response to the sender of the PRIVMSG with a given message via a private message.
-  Example: `reply_priv "Hi"`
+  Example: `reply_admin "Hi"`
   """
   defmacro reply_admin(response) do
     quote do
-      #recip = Kaguya.Module.get_recip(var!(message))
-      Volapi.Client.Sender.send_message(response, admin: true)
+      room = var!(message).room
+      Volapi.Client.Sender.send_message(response, admin: true, room)
     end
   end
 

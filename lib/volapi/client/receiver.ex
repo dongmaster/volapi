@@ -48,7 +48,7 @@ defmodule Volapi.Client.Receiver do
   def parse([[[_, ["files", %{"files" => files}]], server_ack] | t], room) do
     Volapi.Server.Client.set_ack(:server, server_ack, room)
 
-    handle_file(files)
+    handle_file(files, room)
     |> Volapi.Server.Client.add_files(room)
 
     parse(t, room)
@@ -135,7 +135,7 @@ defmodule Volapi.Client.Receiver do
     Volapi.WebSocket.Server.volaping(2, room)
   end
 
-  def handle_file(files) do
+  def handle_file(files, room) do
     Enum.map(files, fn
       [file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _] ->
         metadata =
@@ -161,6 +161,7 @@ defmodule Volapi.Client.Receiver do
           file_expiration_time: file_expiration_time,
           file_life_time: file_life_time,
           metadata: metadata,
+          room: room,
         }
       _ ->
         %Volapi.Message.File{}
