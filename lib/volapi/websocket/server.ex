@@ -1,4 +1,5 @@
 defmodule Volapi.WebSocket.Server do
+  require Logger
   @behaviour :websocket_client
   @volafile_wss_url "wss://volafile.io/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>"
 
@@ -50,9 +51,8 @@ defmodule Volapi.WebSocket.Server do
     {:ok, state}
   end
 
-  def ondisconnect({:remote, :closed}, state) do
-    IO.inspect "Disconnected! State: "
-    IO.inspect Volapi.Server.Client.get_state(state.room)
+  def ondisconnect({_, :closed}, state) do
+    Logger.debug("WebSocket.Server has disconnected from Volafile!")
     {:reconnect, state}
   end
 
@@ -61,23 +61,20 @@ defmodule Volapi.WebSocket.Server do
   end
 
   def websocket_handle({:text, << "0" :: binary, data :: binary >>}, _conn_state, state) do
-    IO.puts "Received message from 0"
-    IO.inspect data
+    Logger.debug("0DATA: #{data}")
 
     Volapi.Client.Receiver.parse(Poison.decode(data), state.room)
     {:ok, state}
   end
 
   def websocket_handle({:text, << "4" :: binary, data :: binary >>}, _conn_state, state) do
-    IO.puts "Received message from 4"
-    IO.inspect data
+    Logger.debug("4DATA: #{data}")
 
     Volapi.Client.Receiver.parse(Poison.decode(data), state.room)
     {:ok, state}
   end
 
   def websocket_handle({:text, something}, _conn_state, state) do
-    IO.inspect something
     {:ok, state}
   end
 
@@ -121,7 +118,7 @@ defmodule Volapi.WebSocket.Server do
   end
 
   def websocket_terminate(reason, conn_state, state) do
-    IO.inspect "Terminated! Reason: #{reason} | state: #{state}"
+    IO.inspect "Terminated! Reason: #{reason}"
     :ok
   end
 
