@@ -91,7 +91,7 @@ defmodule Volapi.Module do
     end
   end
 
-  defmacro __before_compile__(env) do
+  defmacro __before_compile__(_env) do
     quote do
       def handle_cast({_, message}, state) do
         on_message(message)
@@ -328,7 +328,7 @@ defmodule Volapi.Module do
     String.split(match_str)
     |> Enum.reduce([], fn(part, acc) ->
       case String.first(part) do
-        "\:" -> [String.lstrip(part, ?:)|acc]
+        "\\:" -> [String.lstrip(part, ?:)|acc]
         ":" -> [String.lstrip(part, ?:)|acc]
         "~" -> [String.lstrip(part, ?~)|acc]
         _ -> acc
@@ -440,7 +440,7 @@ defmodule Volapi.Module do
 
   defp gen_part(part, match_group) do
     case part do
-      "\:" <> param ->
+      "\\:" <> param ->
         Regex.escape(":" <> param)
       ":" <> param ->
         # Check for embedded regex capture
