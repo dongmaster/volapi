@@ -1,24 +1,8 @@
 # Volapi
 
-**TODO: Add description**
+This is a simple and reliable API client for [Volafile.io](https://volafile.io).
 
-## Installation
+This project is not yet 100% "stable", but it can still be used for bots and such (just because the version number is 1.X.X doesn't mean it's stable).
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-  1. Add `volapi` to your list of dependencies in `mix.exs`:
-
-    ```elixir
-    def deps do
-      [{:volapi, "~> 0.1.0"}]
-    end
-    ```
-
-  2. Ensure `volapi` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:volapi]]
-    end
-    ```
+If you want to use this, you should know that breaking changes will be introduced.
 
