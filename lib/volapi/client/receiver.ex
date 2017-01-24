@@ -19,7 +19,6 @@ defmodule Volapi.Client.Receiver do
   """
   def parse({:ok, %{"version" => version, "session" => session, "ack" => ack}}, room) do
     Volapi.Server.Client.set_ack(:server, ack, room)
-    IO.puts "HELLO"
     Volapi.Client.Sender.subscribe(Application.get_env(:volapi, :nick), room)
   end
 
@@ -38,7 +37,6 @@ defmodule Volapi.Client.Receiver do
   def parse([[[_, ["user_count", user_count]], server_ack] | t], room) do
     Volapi.Server.Client.set_ack(:server, server_ack, room)
     Volapi.Server.Client.set_user_count(%Volapi.Message.UserCount{user_count: user_count, room: room}, room)
-    Logger.debug("User count: #{user_count}")
     parse(t, room)
   end
 

@@ -78,42 +78,27 @@ defmodule Volapi.WebSocket.Server do
     {:ok, state}
   end
 
-  #def websocket_handle({:text, {:reply, data}}, _conn_state, state) do
-  #  IO.inspect data
-  #  {:reply, {:text, data}, state}
-  #end
-
-  # def websocket_info({:set_ack, {ack_type, ack}}, _conn_state, state) do
-  #   {:ok, Map.put(state, ack_type, ack)}
-  # end
-
-  # def websocket_info({:delta_ack, {ack_type, delta}}, _conn_state, state) do
-  #   {:ok, Map.put(state, ack_type, ack + delta)}
-  # end
-
   def websocket_info({:volaping, ping_reply}, _conn_state, state) do
     {:reply, {:text, ping_reply}, state}
   end
 
   def websocket_info({:text, {:reply, data}}, _conn_state, state) do
+    Logger.debug("REPLY: #{data}")
     IO.inspect data
     {:reply, {:text, "4" <> data}, state}
   end
 
   def websocket_info(:state, _conn_state, state) do
-    IO.inspect state
     {:ok, state}
   end
 
   def websocket_info(:start, _conn_state, state) do
     IO.puts "help does this execute?"
-    # {:reply, {:text, "erlang message received"}, state}
     {:ok, state}
   end
 
   def websocket_info(_something, _conn_state, state) do
     IO.puts "help does this execute? how about this"
-    # {:reply, {:text, "erlang message received"}, state}
     {:ok, state}
   end
 

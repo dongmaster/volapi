@@ -577,7 +577,7 @@ defmodule Volapi.Module do
   defmacro reply(response) do
     quote do
       room = var!(message).room
-      Volapi.Client.Sender.send_message(response, room)
+      Volapi.Client.Sender.send_message(unquote(response), room)
     end
   end
 
@@ -588,7 +588,7 @@ defmodule Volapi.Module do
   defmacro reply_me(response) do
     quote do
       room = var!(message).room
-      Volapi.Client.Sender.send_message(response, :me, room)
+      Volapi.Client.Sender.send_message(unquote(response), :me, room)
     end
   end
 
@@ -599,7 +599,7 @@ defmodule Volapi.Module do
   defmacro reply_admin(response) do
     quote do
       room = var!(message).room
-      Volapi.Client.Sender.send_message(response, :admin, room)
+      Volapi.Client.Sender.send_message(unquote(response), :admin, room)
     end
   end
 
