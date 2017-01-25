@@ -105,6 +105,14 @@ defmodule Volapi.Server do
     {:reply, :ok, new_state}
   end
 
+  def handle_call({:get_file, file_id}, _from, state) do
+    files = Map.get(state, :files)
+
+    file = Enum.filter(files, fn(x) -> x.file_id == file_id end)
+
+    {:reply, file, state}
+  end
+
   def handle_call(:get_files, _from, state) do
     files = Map.get(state, :files)
     {:reply, files, state}

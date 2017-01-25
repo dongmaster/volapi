@@ -59,12 +59,18 @@ defmodule Volapi.Server.Client do
     GenServer.call(this(room), {:add_files, files})
   end
 
+  def get_file(file_id, room) do
+    GenServer.call(this(room), {:get_file, file_id})
+  end
+
   def get_files(room) do
     GenServer.call(this(room), :get_files)
   end
 
   def del_file(file, room) do
-    Util.cast(:file_delete, file)
+    # The reason for using get_file here is that it is kind of retarded to just return the file_id of a deleted file.
+    # It's not very useful by itself, thus it is much better to just return the whole file map.
+    Util.cast(:file_delete, get_file(file, room))
 
     GenServer.call(this(room), {:del_file, file})
   end
