@@ -12,8 +12,8 @@ defmodule Volapi.Message.Chat do
     self: false,
     admin: false,
     donator: false,
-    profile: "",
     staff: false,
+    profile: "",
     user: false, # This is true if the user is logged in.
   ]
 
