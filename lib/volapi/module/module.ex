@@ -128,7 +128,7 @@ defmodule Volapi.Module do
   - file_delete
   - timeout
   - user_count
-  - login
+  - logged_in
   - is_owner
   - connect
   """
@@ -182,9 +182,9 @@ defmodule Volapi.Module do
     end
   end
 
-  defmacro handle("login", do: body) do
+  defmacro handle("logged_in", do: body) do
     quote do
-      def handle_cast({:login, var!(message)}, state) do
+      def handle_cast({:logged_in, var!(message)}, state) do
         on_message(var!(message))
         unquote(body)
         {:noreply, state}
