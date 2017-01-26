@@ -105,12 +105,12 @@ defmodule Volapi.Client.Receiver do
   end
 
   def parse([[[_, ["login", name]], server_ack] | t], room) do
-    Volapi.Server.Client.login(%Volapi.Message.Login{logged_in: true, nick: name, room: room})
+    Volapi.Server.Client.login(%Volapi.Message.Login{logged_in: true, nick: name, room: room}, room)
     parse(t, room)
   end
 
   def parse([[[_, ["logout", _]], server_ack] | t], room) do
-    Volapi.Server.Client.logout(%Volapi.Message.Login{logged_in: false, room: room})
+    Volapi.Server.Client.logout(%Volapi.Message.Login{logged_in: false, room: room}, room)
     parse(t, room)
   end
 
