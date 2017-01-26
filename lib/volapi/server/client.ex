@@ -116,4 +116,18 @@ defmodule Volapi.Server.Client do
   def get_timeouts(room) do
     GenServer.call(this(room), :get_timeouts)
   end
+
+  # Login
+
+  def login(message, room) do
+    Util.cast(:logged_in, message)
+
+    GenServer.call(this(room), {:logged_in, true})
+  end
+
+  def logout(message, room) do
+    Util.cast(:logged_in, message)
+
+    GenServer.call(this(room), {:logged_in, false})
+  end
 end

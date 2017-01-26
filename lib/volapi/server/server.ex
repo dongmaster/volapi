@@ -10,6 +10,7 @@ defmodule Volapi.Server do
     file_max_size: 0,
     file_time_to_live: 0,
     max_room_name_length: 0,
+    logged_in: false,
     motd: "",
     name: "",
     owner: "",
@@ -166,5 +167,12 @@ defmodule Volapi.Server do
   def handle_call(:get_timeouts, _from, state) do
     timeouts = Map.get(state, :timeouts)
     {:reply, timeouts, state}
+  end
+
+  # Logged in
+
+  def handle_call({:logged_in, logged_in}, _from, state) do
+    state = Map.put(state, :logged_in, logged_in)
+    {:reply, logged_in, state}
   end
 end
