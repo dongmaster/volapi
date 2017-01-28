@@ -3,6 +3,7 @@ defmodule Volapi.Message.Chat do
   defstruct [
     raw_message: [],
     message: "", # Multi-part. Multiple parts can be witnessed when using newlines in a message and links.
+    message_alt: "",
     room: "",
     nick: "",
     nick_alt: "", # Convenience key. Useful for pattern matching. It's just the nick downcased.
@@ -18,15 +19,6 @@ defmodule Volapi.Message.Chat do
   ]
 
   def raw_to_string(raw_message) do
-    #Enum.reduce(raw_message, "", fn
-    #  (%{"type" => "text", "value" => value}, acc) ->
-    #    acc <> value <> " "
-    #  (%{"type" => "url", "text" => value}, acc) ->
-    #    acc <> value <> " "
-    #  (%{"type" => "break"}, acc) ->
-    #    (acc |> String.trim) <> "\n"
-    #end)
-
     Enum.map_join(raw_message, "", fn
       %{"type" => "text", "value" => value} ->
         value
@@ -38,6 +30,28 @@ defmodule Volapi.Message.Chat do
         "@#{id}"
       %{"type" => "room", "id" => id} -> # Same as the comment about about the file message type.
         "##{id}"
+      %{"value" => value} ->
+        value
+      _ ->
+        ""
+    end)
+  end
+
+  @doc """
+  Alternate version of the raw_to_string function where filenames and room names are outputted to the string, instead of the file id and room id.
+  """
+  def raw_to_string_alternate(raw_message) do
+    Enum.map_join(raw_message, "", fn
+      %{"type" => "text", "value" => value} ->
+        value
+      %{"type" => "url", "text" => value} ->
+        value
+      %{"type" => "break"} ->
+        "\n"
+      %{"type" => "file", "name" => name} -> # There's a third key in this map called "name" which includes the name of the file.
+        name
+      %{"type" => "room", "name" => name} -> # Same as the comment about about the file message type.
+        name
       %{"value" => value} ->
         value
       _ ->

@@ -70,6 +70,7 @@ defmodule Volapi.Client.Receiver do
     {
       raw_message: message,
       message: Volapi.Message.Chat.raw_to_string(message),
+      message_alt: Volapi.Message.Chat.raw_to_string_alternate(message),
       room: room,
       self: Map.get(data, "self", false),
       id: Map.get(data, "id", ""),
