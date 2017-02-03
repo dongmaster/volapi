@@ -29,7 +29,7 @@ defmodule Volapi.Util do
     {:ok, %{body: body}} = HTTPoison.get(EEx.eval_string(@volafile_room_url, [room: room]))
 
     text = Regex.replace(~r'(\w+):(?=([^"\\]*(\\.|"([^"\\]*\\.)*[^"\\]*"))*[^"]*$)', body, "\"\\1\":")
-    |> String.replace("true", "\"true\"") |> String.replace("false", "\"false\"") |> String.replace("\n", "")
+    |> String.replace("\n", "")
 
     {:ok, config} = Regex.run(~r'config=({.+});', text, capture: :all_but_first)
     |> Poison.decode
