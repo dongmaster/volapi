@@ -51,8 +51,9 @@ defmodule Volapi.WebSocket.Server do
     {:ok, state}
   end
 
-  def ondisconnect({_, :closed}, state) do
-    Logger.debug("WebSocket.Server has disconnected from Volafile!")
+  def ondisconnect({_, reason}, state) do
+    Logger.error("[!!!] The websocket connection was closed! Error: \"#{reason}\". Reconnecting...")
+    Process.sleep(2000)
     {:reconnect, state}
   end
 
