@@ -16,7 +16,7 @@ Create a new mix project and add this to your deps:
 ```elixir
 defp deps do
   [
-    {:volapi, "~> v2.1.15"}
+    {:volapi, git: "https://github.com/dongmaster/volapi", tag: "v2.1.15"},
   ]
 end
 ```
