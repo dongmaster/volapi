@@ -21,6 +21,14 @@ defp deps do
 end
 ```
 
+You also need to add `:volapi` to the applications list in the mix.exs file.
+```elixir
+def application do
+  [applications: [:logger, :volapi],
+   mod: {Volapi, []}]
+end
+```
+
 Pull in the dependencies with `mix deps.get`.
 
 Next, open `config/config.exs` in your favorite text editor.
