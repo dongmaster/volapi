@@ -18,6 +18,7 @@ defp deps do
   [
     {:volapi, "~> v2.1.15"}
   ]
+end
 ```
 
 Pull in the dependencies with `mix deps.get`.
