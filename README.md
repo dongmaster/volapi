@@ -81,6 +81,7 @@ defmodule Volapi.Bot.Basic2 do
   use Volapi.Module, "basic2"
 
   ## Handlers
+
   handle "chat" do
     enforce :beepi do
       match ~r/linux/i, :linux
