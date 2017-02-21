@@ -24,6 +24,7 @@ defmodule Volapi.Client.Receiver do
 
   def parse({:ok, [client_ack | frames]}, room) do
     Volapi.Server.Client.set_ack(:client, client_ack, room)
+    Volapi.KeepAlive.keep_alive(room)
     parse(frames, room)
   end
 

@@ -13,11 +13,11 @@ defmodule Volapi.Server.Client do
   # Ack
 
   def set_ack(:server, ack, room) do
-    GenServer.call(this(room), {:set_ack, {:server_ack, ack}})
+    GenServer.cast(this(room), {:set_ack, {:server_ack, ack}})
   end
 
   def set_ack(:client, ack, room) do
-    GenServer.call(this(room), {:set_ack, {:client_ack, ack}})
+    GenServer.cast(this(room), {:set_ack, {:client_ack, ack}})
   end
 
   def get_ack(:server, room) do
@@ -39,7 +39,7 @@ defmodule Volapi.Server.Client do
   def set_user_count(user_count, room) do
     Util.cast(:user_count, user_count)
 
-    GenServer.call(this(room), {:set_user_count, user_count})
+    GenServer.cast(this(room), {:set_user_count, user_count})
   end
 
   def get_user_count(room) do
@@ -48,15 +48,18 @@ defmodule Volapi.Server.Client do
 
   # Files
 
-  def add_file(file, room) do
-    Util.cast(:file, file)
-    GenServer.call(this(room), {:add_file, file})
-  end
-
   def add_files(files, room) do
     Util.cast_list(:file, files)
 
-    GenServer.call(this(room), {:add_files, files})
+    spawn(fn ->
+      Enum.each(files, fn(file) ->
+        ttl = file.file_expiration_time - file.file_life_time
+
+        Process.send_after(this(room), {:del_file, file}, ttl)
+      end)
+    end)
+
+    GenServer.cast(this(room), {:add_files, files})
   end
 
   def get_file(file_id, room) do
@@ -72,33 +75,20 @@ defmodule Volapi.Server.Client do
     # It's not very useful by itself, thus it is much better to just return the whole file map.
     Util.cast(:file_delete, get_file(file, room))
 
-    GenServer.call(this(room), {:del_file, file})
+    GenServer.cast(this(room), {:del_file, file})
   end
 
-  def del_files(files, room) do
-    Util.cast_list(:file_delete, files)
+  # Chat
 
-    Enum.each(files, fn(x) ->
-      GenServer.call(this(room), {:del_file, x})
-    end)
-  end
-
-  # Chat messages
-
-  def add_message(message, room) do
+  def add_message(message, _room) do
     Util.cast(:msg, message)
-
-    GenServer.call(this(room), {:add_message, message})
-  end
-
-  def get_messages(room) do
-    GenServer.call(this(room), :get_messages)
+    :ok
   end
 
   # Config
 
   def set_config(key, value, room) do
-    GenServer.call(this(room), {:set_state_custom, key, value})
+    GenServer.cast(this(room), {:set_state_custom, key, value})
   end
 
   def get_config(key, room) do
@@ -128,6 +118,12 @@ defmodule Volapi.Server.Client do
   def logout(message, room) do
     Util.cast(:logged_in, message)
 
-    GenServer.call(this(room), {:logged_in, false})
+    GenServer.cast(this(room), {:logged_in, false})
+  end
+
+  # Keep alive
+
+  def keep_alive(room) do
+    GenServer.cast(this(room), :keep_alive)
   end
 end

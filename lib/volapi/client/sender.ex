@@ -6,7 +6,6 @@ defmodule Volapi.Client.Sender do
   def gen_send(frame, room) do
     {:ok, data} = gen_build(frame, room) |> Poison.encode
 
-    IO.puts "HEYO"
     Volapi.WebSocket.Server.reply(data, room)
   end
 
@@ -28,6 +27,15 @@ defmodule Volapi.Client.Sender do
     server_ack = Volapi.Server.Client.get_ack(:server, room)
     client_ack = Volapi.Server.Client.get_ack(:client, room) + client_ack_offset
     [server_ack, [[0, frame], client_ack]]
+  end
+
+  @doc """
+  Special internal function that should hopefully keep the connection alive.
+  """
+  def keep_alive(room) do
+    {:ok, data} = [Volapi.Server.Client.get_ack(:server, room)] |> Poison.encode
+
+    Volapi.WebSocket.Server.reply(data, room)
   end
 
   def subscribe(nick, room) do

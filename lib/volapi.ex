@@ -14,6 +14,7 @@ defmodule Volapi do
       #worker(Volapi.WebSocket.Server, [url]),
       supervisor(Volapi.Server.Supervisor, []),
       supervisor(Volapi.WebSocket.Supervisor, []),
+      supervisor(Volapi.KeepAlive.Supervisor, []),
       supervisor(Volapi.Module.Supervisor, [[name: Volapi.Module.Supervisor]])
     ]
 

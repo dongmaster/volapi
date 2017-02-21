@@ -20,3 +20,6 @@ erl_crash.dump
 /config/config.exs
 
 /lib/volapi/secret/*
+
+# Just so I can test new changes and shit without committing it to the repo.
+/lib/bot/*
