@@ -112,7 +112,7 @@ defmodule Volapi.Server.Client do
   def login(message, room) do
     Util.cast(:logged_in, message)
 
-    GenServer.call(this(room), {:logged_in, true})
+    GenServer.cast(this(room), {:logged_in, true})
   end
 
   def logout(message, room) do
