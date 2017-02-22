@@ -75,4 +75,12 @@ defmodule Volapi.Util do
         message.user_count
     end
   end
+
+  def upload(file_path, room) do
+    upload(file_path, Path.basename(file_path), room)
+  end
+
+  def upload(file_path, filename, room) do
+    Volexupload.main(Application.get_env(:volapi, :nick), room, file_path, filename)
+  end
 end
