@@ -16,6 +16,7 @@ defmodule Volapi.Server do
     private: true,
     room_id: "",
     timeouts: [],
+    room_score: 0,
   ]
 
   ## Client API

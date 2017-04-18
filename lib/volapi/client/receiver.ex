@@ -128,6 +128,11 @@ defmodule Volapi.Client.Receiver do
     parse(t, room)
   end
 
+  def parse([[[_, ["roomScore", room_score]], server_ack] | t], room) do
+    Volapi.Server.Client.set_config(:room_score, room_score, room)
+    parse(t, room)
+  end
+
   def parse([[h, server_ack] | t], room) do
     Volapi.Server.Client.set_ack(:server, server_ack, room)
     IO.puts("Ignoring the following frame:")
