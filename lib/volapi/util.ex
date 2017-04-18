@@ -31,7 +31,7 @@ defmodule Volapi.Util do
     text = Regex.replace(~r'(\w+):(?=([^"\\]*(\\.|"([^"\\]*\\.)*[^"\\]*"))*[^"]*$)', body, "\"\\1\":")
     |> String.replace("\n", "")
 
-    {:ok, config} = Regex.run(~r'config=({.+});', text, capture: :all_but_first)
+    {:ok, config} = Regex.run(~r'config = ({.+});', text, capture: :all_but_first)
     |> Poison.decode
 
     config
