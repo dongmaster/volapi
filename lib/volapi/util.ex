@@ -1,6 +1,7 @@
 defmodule Volapi.Util do
-  @volafile_room_url "https://volafile.io/r/<%= room %>"
-  @volafile_login_url "https://volafile.io/rest/login?name=<%= name %>&password=<%= password %>"
+  @server Application.get_env(:volapi, :server, "volafile.org")
+  @volafile_room_url "https://#{@server}/r/<%= room %>"
+  @volafile_login_url "https://#{@server}/rest/login?name=<%= name %>&password=<%= password %>"
   @moduledoc """
   This module is used for utility functions.
   """
@@ -16,7 +17,7 @@ defmodule Volapi.Util do
   def get_checksum() do
     HTTPoison.start
 
-    {:ok, %{body: body}} = HTTPoison.get("https://static.volafile.io/static/js/main.js")
+    {:ok, %{body: body}} = HTTPoison.get("https://static.#{@server}/static/js/main.js")
 
     # This returns the checksum. thanks dodos for the regex
     Regex.run(~r/config\.checksum\s*=\s*"(\w+?)"/, body) |> Enum.at(1)
@@ -44,7 +45,7 @@ defmodule Volapi.Util do
     password = Application.get_env(:volapi, :password, nil)
 
     if password != nil do
-      {:ok, %{body: body}} = HTTPoison.get(EEx.eval_string(@volafile_login_url, [name: nick, password: password]), [{"Accept", "application/json"}, {"Referer", "https://volafile.io"}])
+      {:ok, %{body: body}} = HTTPoison.get(EEx.eval_string(@volafile_login_url, [name: nick, password: password]), [{"Accept", "application/json"}, {"Referer", "https://#{@server}"}])
 
       {:ok, resp} = Poison.decode(body)
 

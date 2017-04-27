@@ -1,7 +1,7 @@
 defmodule Volapi.WebSocket.Server do
   require Logger
   @behaviour :websocket_client
-  @volafile_wss_url "wss://volafile.io/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>"
+  @volafile_wss_url "wss://#{Application.get_env(:volapi, :server, "volafile.org")}/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>"
 
   # Client API
 

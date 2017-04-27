@@ -1,6 +1,6 @@
 # Volapi
 
-This is a simple and reliable API client for [Volafile.io](https://volafile.io).
+This is a simple and reliable API client for [Volafile.org](https://volafile.org).
 
 Volapi.ex is reasonably stable and should work for most purposes.
 Some features have yet to been implemented though, because I'm lazy.
