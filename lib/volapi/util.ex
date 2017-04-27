@@ -17,7 +17,7 @@ defmodule Volapi.Util do
   def get_checksum() do
     HTTPoison.start
 
-    {:ok, %{body: body}} = HTTPoison.get("http://static.#{@server}/static/js/main.js")
+    {:ok, %{body: body}} = HTTPoison.get("https://#{@server}/static/js/main.js")
 
     # This returns the checksum. thanks dodos for the regex
     Regex.run(~r/config\.checksum\s*=\s*"(\w+?)"/, body) |> Enum.at(1)
