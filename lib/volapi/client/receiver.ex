@@ -83,7 +83,10 @@ defmodule Volapi.Client.Receiver do
       donator: Map.get(options, "donator", false),
       profile: Map.get(options, "profile", ""),
       staff: Map.get(options, "staff", false),
-      user: Map.get(options, "user", false),
+      user: Map.get(options, "user", false), # This will be phased out/deprecated soon, will be changed to logged_in
+      logged_in: Map.get(options, "user", false),
+      files: Volapi.Message.Chat.get_files(message), # Files mentioned in the chat message
+      rooms: Volapi.Message.Chat.get_rooms(message), # Rooms mentioned in the chat message
     }
 
     Volapi.Server.Client.add_message(msg, room)

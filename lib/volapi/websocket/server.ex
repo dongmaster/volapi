@@ -1,12 +1,12 @@
 defmodule Volapi.WebSocket.Server do
   require Logger
   @behaviour :websocket_client
-  @volafile_wss_url "wss://#{Application.get_env(:volapi, :server, "volafile.org")}/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>"
+  @volafile_wss_url "wss://#{Application.get_env(:volapi, :server, "volafile.org")}/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>&cs=<%= cs %>&nick=<%= nick %>&room=<%= room %>"
 
   # Client API
 
   def start_link(room) do
-    url = generate_wss_url(@volafile_wss_url)
+    url = generate_wss_url(@volafile_wss_url, room)
     result = {:ok, pid} = :websocket_client.start_link(url, __MODULE__, %{room: room})
     :global.register_name(this(room), pid)
     result
@@ -33,11 +33,13 @@ defmodule Volapi.WebSocket.Server do
     reply(room, data)
   end
 
-  def generate_wss_url(volafile_wss_url) do
+  def generate_wss_url(volafile_wss_url, room) do
     rn = Volapi.Util.random_id(10)
     t = Volapi.Util.random_id(7)
+    cs = Volapi.Util.get_checksum()
+    nick = Application.get_env(:volapi, :nick)
 
-    EEx.eval_string(volafile_wss_url, [rn: rn, t: t])
+    EEx.eval_string(volafile_wss_url, [rn: rn, t: t, cs: cs, nick: nick, room: room])
   end
 
   # Server API

@@ -3,11 +3,11 @@ defmodule Volapi.Module do
   Module which provides functionality used for creating Volapi modules.
 
 
-  When  this module is used, it will create wrapper functions which allow it to be automatically registered as a module and include all macros. It can be included with:
+  When this module is used, it will create wrapper functions which allow it to be automatically registered as a module and include all macros. It can be included with:
   `use Kaguya.Module, "module name here"`
 
 
-  Once this is done, the module will start automatically and be able to use the `handle`, `defh`, and other macros.
+  Once this is done, the module will start automatically and you will be able to use `handle`, `defh`, and other macros.
 
 
   Modules can be loaded and unloaded using `Volapi.Util.loadModule`, `Volapi.Util.unloadModule`,
@@ -552,6 +552,25 @@ defmodule Volapi.Module do
     enforce_rec([validator], body)
   end
 
+  def enforce_rec([{m, v}], body) do
+    quote do
+      if apply(unquote(m), unquote(v), [var!(message)]) do
+        unquote(body)
+      end
+    end
+  end
+
+  def enforce_rec([{m, v} | rest], body) do
+    nb =
+      quote do
+        if apply(unquote(m), unquote(v), [var!(message)]) do
+          unquote(body)
+        end
+      end
+
+    enforce_rec(rest, nb)
+  end
+
   def enforce_rec([v], body) do
     quote do
       if unquote(v)(var!(message)) do
@@ -567,6 +586,7 @@ defmodule Volapi.Module do
           unquote(body)
         end
       end
+
     enforce_rec(rest, nb)
   end
 

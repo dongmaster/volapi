@@ -16,6 +16,9 @@ defmodule Volapi.Message.Chat do
     staff: false,
     profile: "",
     user: false, # This is true if the user is logged in.
+    logged_in: false,
+    files: [],
+    rooms: [],
   ]
 
   def raw_to_string(raw_message) do
@@ -57,5 +60,17 @@ defmodule Volapi.Message.Chat do
       _ ->
         ""
     end)
+  end
+
+  def get_files(raw_message) do
+    for %{"type" => type, "id" => id} when type === "file" <- raw_message do
+      id
+    end
+  end
+
+  def get_rooms(raw_message) do
+    for %{"type" => type, "id" => id} when type === "room" <- raw_message do
+      id
+    end
   end
 end
