@@ -19,7 +19,6 @@ defmodule Volapi.Client.Receiver do
   """
   def parse({:ok, %{"version" => version, "session" => session, "ack" => ack}}, room) do
     Volapi.Server.Client.set_ack(:server, ack, room)
-    Volapi.Client.Sender.subscribe(Application.get_env(:volapi, :nick), room)
   end
 
   def parse({:ok, [client_ack | frames]}, room) do
