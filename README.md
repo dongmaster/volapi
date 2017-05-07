@@ -70,10 +70,10 @@ end
 ### Multiple rooms
 Just change the `rooms` key in the config to ["room1", "room2"] to join several rooms.
 
-This example is a bit trickier, because each room have unique responses, depending on the room.
-BEEPi has the response "Don't you mean GNU/Linux?"
-and
-HvoXw has the response "Don't you mean GNU/Hollywood?"
+This example is a bit trickier, because each room have unique responses, depending on the room.  
+BEEPi has the response "Don't you mean GNU/Linux?"  
+and  
+HvoXw has the response "Don't you mean GNU/Hollywood?"  
 
 This is easily solvable though :^)
 ```elixir
@@ -84,11 +84,11 @@ defmodule Volapi.Bot.Basic2 do
 
   handle "chat" do
     enforce :beepi do
-      match ~r/linux/i, :linux
+      match_re ~r/linux/i, :linux
     end
 
     enforce :hvoxw do
-      match ~r/hollywood/i, :hollywood
+      match_re ~r/hollywood/i, :hollywood
     end
   end
 
