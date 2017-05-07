@@ -7,7 +7,20 @@ defmodule Volapi.WebSocket.Server do
 
   def start_link(room) do
     url = generate_wss_url(@volafile_wss_url, room)
-    result = {:ok, pid} = :websocket_client.start_link(url, __MODULE__, %{room: room})
+
+    result = {:ok, pid} =
+      if Application.get_env(:volapi, :password, nil) != nil and Application.get_env(:volapi, :auto_login, false) === true do
+        case Volapi.Util.get_login_key(room) do
+          {:error, message} ->
+            Logger.error(message)
+            :websocket_client.start_link(url, __MODULE__, %{room: room})
+          {:success, key} ->
+            :websocket_client.start_link(url, __MODULE__, %{room: room}, [{:extra_headers, [{"Cookie", "session=#{key}"}]}])
+        end
+      else
+        :websocket_client.start_link(url, __MODULE__, %{room: room})
+      end
+
     :global.register_name(this(room), pid)
     result
   end

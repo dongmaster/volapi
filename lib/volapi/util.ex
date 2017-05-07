@@ -38,7 +38,7 @@ defmodule Volapi.Util do
     config
   end
 
-  def login(room) do
+  def get_login_key(room) do
     HTTPoison.start
 
     nick = Application.get_env(:volapi, :nick)
@@ -49,18 +49,29 @@ defmodule Volapi.Util do
 
       {:ok, resp} = Poison.decode(body)
 
-
       case resp do
         %{"error" => %{"code" => code, "message" => message}} ->
           {:error, "Couldn't login because of: #{message}"}
         %{"session" => session} ->
-          Volapi.Client.Sender.login(session, room)
+          {:success, session}
         lol ->
           IO.inspect lol
           {:error, "Couldn't pattern match on the /rest/login response."}
       end
     else
       {:error, "There is no password key in the config.exs file."}
+    end
+  end
+
+  def login(room) do
+    require Logger
+    session = get_login_key(room)
+
+    case session do
+      {:error, message} ->
+        Logger.error(message)
+      {:success, key} ->
+        Volapi.Client.Sender.login(key, room)
     end
   end
 
