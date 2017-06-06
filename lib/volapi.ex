@@ -9,6 +9,15 @@ defmodule Volapi do
     :pg2.create(:modules)
     :ets.new(:modules, [:set, :named_table, :public, {:read_concurrency, true}, {:write_concurrency, true}])
 
+    tables = Application.get_env(:volapi, :ets_tables, [])
+
+    Enum.each(tables, fn
+      {table, options} ->
+        Volapi.Util.load_table(table, options)
+      table when is_atom(table) ->
+        Volapi.Util.load_table(table)
+    end)
+
     children = [
       #worker(Volapi.Server, []),
       #worker(Volapi.WebSocket.Server, [url]),
