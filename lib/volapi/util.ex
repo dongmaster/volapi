@@ -1,4 +1,5 @@
 defmodule Volapi.Util do
+  require Logger
   @server Application.get_env(:volapi, :server, "volafile.org")
   @volafile_room_url "https://#{@server}/r/<%= room %>"
   @volafile_login_url "https://#{@server}/rest/login?name=<%= name %>&password=<%= password %>"
