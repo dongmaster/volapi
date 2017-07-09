@@ -38,7 +38,7 @@ defmodule Volapi.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:websocket_client, git: "https://github.com/sanmiguel/websocket_client"},
+      {:websocket_client, "~> 1.2"},
       {:poison, "~> 3.0"},
       {:httpoison, "~> 0.10.0"},
       {:ex_doc, "~> 0.14.5", only: :dev}

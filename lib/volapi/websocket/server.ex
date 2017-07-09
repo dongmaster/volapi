@@ -3,6 +3,11 @@ defmodule Volapi.WebSocket.Server do
   @behaviour :websocket_client
   @volafile_wss_url "wss://#{Application.get_env(:volapi, :server, "volafile.org")}/api/?rn=<%= rn %>&EIO=3&transport=websocket&t=<%= t %>&cs=<%= cs %>&nick=<%= nick %>&room=<%= room %>"
 
+  defstruct [
+    room: "",
+    connected: false,
+  ]
+
   # Client API
 
   def start_link(room) do
@@ -13,12 +18,12 @@ defmodule Volapi.WebSocket.Server do
         case Volapi.Util.get_login_key(room) do
           {:error, message} ->
             Logger.error(message)
-            :websocket_client.start_link(url, __MODULE__, %{room: room})
+            :websocket_client.start_link(url, __MODULE__, %__MODULE__{room: room})
           {:success, key} ->
-            :websocket_client.start_link(url, __MODULE__, %{room: room}, [{:extra_headers, [{"Cookie", "session=#{key}"}]}])
+            :websocket_client.start_link(url, __MODULE__, %__MODULE__{room: room}, [{:extra_headers, [{"Cookie", "session=#{key}"}]}])
         end
       else
-        :websocket_client.start_link(url, __MODULE__, %{room: room})
+        :websocket_client.start_link(url, __MODULE__, %__MODULE__{room: room})
       end
 
     :global.register_name(this(room), pid)
@@ -61,9 +66,9 @@ defmodule Volapi.WebSocket.Server do
     {:once, state}
   end
 
-  def onconnect(wsreq, state) do
+  def onconnect(_wsreq, state) do
     # IO.inspect wsreq
-    {:ok, state}
+    {:ok, %{state | connected: true}}
   end
 
   def ondisconnect({_, reason}, state) do
@@ -71,7 +76,7 @@ defmodule Volapi.WebSocket.Server do
     IO.inspect reason, label: "Reason for disconnect"
     Volapi.Server.Client.set_config(:files, %Volapi.Server{}.files, state.room)
     Process.sleep(2000)
-    {:reconnect, state}
+    {:reconnect, %{state | connected: false}}
   end
 
   def websocket_handle({:pong, _}, _conn_state, state) do
@@ -97,13 +102,23 @@ defmodule Volapi.WebSocket.Server do
   end
 
   def websocket_info({:volaping, ping_reply}, _conn_state, state) do
-    {:reply, {:text, ping_reply}, state}
+    if state.connected == true do
+      {:reply, {:text, ping_reply}, state}
+    else
+      Process.send_after(self(), {:volaping, ping_reply}, 3000)
+      {:ok, state}
+    end
   end
 
   def websocket_info({:text, {:reply, data}}, _conn_state, state) do
     Logger.debug("REPLY: #{data}")
-    IO.inspect data
-    {:reply, {:text, "4" <> data}, state}
+
+    if state.connected == true do
+      {:reply, {:text, "4" <> data}, state}
+    else
+      Process.send_after(self(), {:text, {:reply, data}}, 3000)
+      {:ok, state}
+    end
   end
 
   def websocket_info(_something, _conn_state, state) do
