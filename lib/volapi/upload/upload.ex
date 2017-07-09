@@ -17,10 +17,10 @@ defmodule Volexupload do
     %{"key" => key, "server" => server, "file_id" => file_id} = Poison.decode!(body)
     #res = Poison.decode!(body)
     #res = %{key: key, server: server, file_id: file_id}
-    {server, room, key}
+    {server, room, key, file_id}
   end
 
-  def upload({server, room, key}, file_path, filename) do
+  def upload({server, room, key, file_id}, file_path, filename) do
     upload_url = EEx.eval_string(@base_upload_url, [server: server, room: room, key: key])
 
     if filename do
@@ -28,5 +28,7 @@ defmodule Volexupload do
     else
       HTTPoison.post!(upload_url, {:multipart, [{:file, file_path, {"form-data", [{"name", "file"}, {"filename", Path.basename(file_path)}]}, []}]}, [{"Origin", @server}, {"Referer", "https://#{@server}"}], [{:timeout, :infinity}, {:recv_timeout, :infinity}])
     end
+
+    file_id
   end
 end

@@ -1,4 +1,5 @@
 defmodule Volapi.Util do
+  require Logger
   @server Application.get_env(:volapi, :server, "volafile.org")
   @volafile_room_url "https://#{@server}/r/<%= room %>"
   @volafile_login_url "https://#{@server}/rest/login?name=<%= name %>&password=<%= password %>"
@@ -94,5 +95,27 @@ defmodule Volapi.Util do
 
   def upload(file_path, filename, room) do
     Volexupload.main(Application.get_env(:volapi, :nick), room, file_path, filename)
+  end
+
+
+
+  def load_table(table) do
+    load_table(table, [])
+  end
+
+  def load_table(table, options) do
+    if File.exists?("#{get_dir()}/#{table}.db") do
+      Logger.debug("Loading #{table} table from file.")
+      :ets.file2tab('#{get_dir()}/#{table}.db')
+      :loaded
+    else
+      Logger.debug("Creating new #{table} table.")
+      :ets.new(table, Application.get_env(:volapi, :ets_options, []) ++ options)
+      :created
+    end
+  end
+
+  defp get_dir do
+    Application.get_env(:volapi, :ets_table_dir, "priv/tables")
   end
 end
