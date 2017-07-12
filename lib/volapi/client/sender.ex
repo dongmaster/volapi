@@ -1,4 +1,7 @@
 defmodule Volapi.Client.Sender do
+  @short 1800
+  @medium 7200
+  @long 86400
 
   @doc """
   Generic function for sending frames using the Volapi.WebSocket.Server
@@ -79,22 +82,57 @@ defmodule Volapi.Client.Sender do
     gen_send(frame, room)
   end
 
+  def timeout_chat(id, nick, :short, room) do
+    timeout_chat(id, nick, @short, room)
+  end
+
+  def timeout_chat(id, nick, :medium, room) do
+    timeout_chat(id, nick, @medium, room)
+  end
+
+  def timeout_chat(id, nick, :long, room) do
+    timeout_chat(id, nick, @long, room)
+  end
+
+  def timeout_chat(id, nick, room) do
+    timeout_chat(id, nick, @medium, room)
+  end
+
   @doc """
   `id` refers to the id key in the %Volapi.Chat{} struct.
   It is only available to room owners.
+
+  The seconds argument can also be :short, :medium and :long.
   """
-  def timeout_chat(id, nick, room) do
-    frame = ["call", %{"fn" => "timeoutChat", "args" => [id, nick]}]
+  def timeout_chat(id, nick, seconds, room) do
+    frame = ["call", %{"fn" => "timeoutChat", "args" => [id, nick, seconds]}]
 
     gen_send(frame, room)
+  end
+
+
+  def timeout_file(id, nick, :short, room) do
+    timeout_file(id, nick, @short, room)
+  end
+
+  def timeout_file(id, nick, :medium, room) do
+    timeout_file(id, nick, @medium, room)
+  end
+
+  def timeout_file(id, nick, :long, room) do
+    timeout_file(id, nick, @long, room)
+  end
+
+  def timeout_file(id, nick, room) do
+    timeout_file(id, nick, @medium, room)
   end
 
   @doc """
   `id` refers to the file_id key in any of the %Volapi.File.*{} structs.
   It is only available to room owners.
   """
-  def timeout_file(id, nick, room) do
-    frame = ["call", %{"fn" => "timeoutFile", "args" => [id, nick]}]
+  def timeout_file(id, nick, seconds, room) do
+    frame = ["call", %{"fn" => "timeoutFile", "args" => [id, nick, seconds]}]
 
     gen_send(frame, room)
   end
