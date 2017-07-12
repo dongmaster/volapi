@@ -150,7 +150,7 @@ defmodule Volapi.Client.Receiver do
   def handle_file(files, room) do
     Enum.map(files, fn
       [file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _] ->
-        metadata =
+        %{user: nick, artist: artist, album: album} =
           case metadata do
             %{"user" => uploader, "artist" => artist, "album" => album} ->
               %{user: uploader, artist: artist, album: album}
@@ -172,7 +172,10 @@ defmodule Volapi.Client.Receiver do
           file_size: file_size,
           file_expiration_time: file_expiration_time,
           file_life_time: file_life_time,
-          metadata: metadata,
+          nick: nick,
+          nick_alt: String.downcase(nick),
+          artist: artist,
+          album: album,
           room: room,
         }
       _ ->
