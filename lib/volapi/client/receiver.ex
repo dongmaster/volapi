@@ -150,18 +150,20 @@ defmodule Volapi.Client.Receiver do
   def handle_file(files, room) do
     Enum.map(files, fn
       [file_id, file_name, file_type, file_size, file_expiration_time, file_life_time, metadata, _] ->
-        %{user: nick, artist: artist, album: album} =
+        %{user: nick, artist: artist, album: album, ip: ip} =
           case metadata do
             %{"user" => uploader, "artist" => artist, "album" => album} ->
-              %{user: uploader, artist: artist, album: album}
+              %{user: uploader, artist: artist, album: album, ip: ""}
             %{"user" => uploader, "artist" => artist} ->
-              %{user: uploader, artist: artist, album: ""}
+              %{user: uploader, artist: artist, album: "", ip: ""}
             %{"user" => uploader, "album" => album} ->
-              %{user: uploader, artist: "", album: album}
+              %{user: uploader, artist: "", album: album, ip: ""}
             %{"user" => uploader} ->
-              %{user: uploader, artist: "", album: ""}
+              %{user: uploader, artist: "", album: "", ip: ""}
+            autism ->
+              %{user: Map.get(autism, "user", ""), artist: Map.get(autism, "artist", ""), album: Map.get(autism, "album", ""), ip: Map.get(autism, "ip", "")}
             _ ->
-              %{user: "", artist: "", album: ""}
+              %{user: "", artist: "", album: "", ip: ""}
           end
 
         %Volapi.Message.File
@@ -172,6 +174,7 @@ defmodule Volapi.Client.Receiver do
           file_size: file_size,
           file_expiration_time: file_expiration_time,
           file_life_time: file_life_time,
+          ip: ip,
           nick: nick,
           nick_alt: String.downcase(nick),
           artist: artist,

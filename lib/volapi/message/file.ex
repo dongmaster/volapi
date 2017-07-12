@@ -6,6 +6,7 @@ defmodule Volapi.Message.File do
     file_size: 0, # Size is in bytes
     file_expiration_time: 0, # UNIX timestamp
     file_life_time: 0, # UNIX timestamp
+    ip: "",
     nick: "",
     nick_alt: "",
     artist: "",
