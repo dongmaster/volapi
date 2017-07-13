@@ -160,8 +160,8 @@ defmodule Volapi.Client.Receiver do
               %{user: uploader, artist: "", album: album, ip: ""}
             %{"user" => uploader} ->
               %{user: uploader, artist: "", album: "", ip: ""}
-            autism ->
-              %{user: Map.get(autism, "user", ""), artist: Map.get(autism, "artist", ""), album: Map.get(autism, "album", ""), ip: Map.get(autism, "ip", "")}
+            # autism ->
+            #   %{user: Map.get(autism, "user", ""), artist: Map.get(autism, "artist", ""), album: Map.get(autism, "album", ""), ip: Map.get(autism, "ip", "")}
             _ ->
               %{user: "", artist: "", album: "", ip: ""}
           end
@@ -174,7 +174,7 @@ defmodule Volapi.Client.Receiver do
           file_size: file_size,
           file_expiration_time: file_expiration_time,
           file_life_time: file_life_time,
-          ip: ip,
+          ip: Map.get(metadata, "ip", ""),
           nick: nick,
           nick_alt: String.downcase(nick),
           artist: artist,
