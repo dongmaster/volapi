@@ -152,6 +152,12 @@ defmodule Volapi.Client.Sender do
     gen_send(frame, room)
   end
 
+  def unban_user(ip, ban_opts, room) do
+    frame = ["call", %{"fn" => "unbanUser", "args" => [ip, ban_opts]}]
+
+    gen_send(frame, room)
+  end
+
   def delete_file(file_id, room) do
     frame = ["call", %{"fn" => "deleteFiles", "args" => [[file_id]]}]
 
