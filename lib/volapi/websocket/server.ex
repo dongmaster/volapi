@@ -76,7 +76,8 @@ defmodule Volapi.WebSocket.Server do
     IO.inspect reason, label: "Reason for disconnect"
     Volapi.Server.Client.set_config(:files, %Volapi.Server{}.files, state.room)
     Process.sleep(6000)
-    {:reconnect, %{state | connected: false}}
+    # {:reconnect, %{state | connected: false}}
+    {:close, "Closing because of disconnect", %{state | connected: false}}
   end
 
   def websocket_handle({:pong, _}, _conn_state, state) do
