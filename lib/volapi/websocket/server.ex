@@ -54,8 +54,10 @@ defmodule Volapi.WebSocket.Server do
   def generate_wss_url(volafile_wss_url, room) do
     rn = Volapi.Util.random_id(10)
     t = Volapi.Util.random_id(7)
-    cs = Volapi.Util.get_checksum()
+    cs = Volapi.Util.get_checksum(room)
     nick = Application.get_env(:volapi, :nick)
+
+    IO.inspect cs
 
     EEx.eval_string(volafile_wss_url, [rn: rn, t: t, cs: cs, nick: nick, room: room])
   end
@@ -77,7 +79,7 @@ defmodule Volapi.WebSocket.Server do
     Volapi.Server.Client.set_config(:files, %Volapi.Server{}.files, state.room)
     Process.sleep(6000)
     # {:reconnect, %{state | connected: false}}
-    {:close, "Closing because of disconnect", %{state | connected: false}}
+    {:close, reason, %{state | connected: false}}
   end
 
   def websocket_handle({:pong, _}, _conn_state, state) do

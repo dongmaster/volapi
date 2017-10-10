@@ -42,7 +42,7 @@ defmodule Volapi.Client.Sender do
   end
 
   def subscribe(nick, room) do
-    checksum = Volapi.Util.get_checksum()
+    checksum = Volapi.Util.get_checksum(room)
 
     frame = ["subscribe", %{"nick" => nick, "room" => room, "checksum" => checksum, "checksum2" => checksum}]
 

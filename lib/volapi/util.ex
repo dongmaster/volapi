@@ -3,6 +3,8 @@ defmodule Volapi.Util do
   @server Application.get_env(:volapi, :server, "volafile.org")
   @volafile_room_url "https://#{@server}/r/<%= room %>"
   @volafile_login_url "https://#{@server}/rest/login?name=<%= name %>&password=<%= password %>"
+  @volafile_rest "https://#{@server}/rest/"
+  @headers [{"Origin", "https://" <> @server}]
   @moduledoc """
   This module is used for utility functions.
   """
@@ -15,13 +17,13 @@ defmodule Volapi.Util do
     :crypto.strong_rand_bytes(length + 5) |> Base.url_encode64(padding: false) |> String.slice(0, length)
   end
 
-  def get_checksum() do
+  def get_checksum(room) do
     HTTPoison.start
 
-    {:ok, %{body: body}} = HTTPoison.get("https://#{@server}/static/js/main.js")
+    {:ok, %{body: body}} = HTTPoison.get(@volafile_rest <> "getRoomConfig?id=" <> room, @headers ++ [{"Referer", EEx.eval_string(@volafile_room_url, [room: room])}, {"Accept", "application/javascript"}])
 
-    # This returns the checksum. thanks dodos for the regex
-    Regex.run(~r/config\.checksum\s*=\s*"(\w+?)"/, body) |> Enum.at(1)
+    Poison.decode!(body)
+    |> Map.get("checksum2")
   end
 
   def get_room_config(room) do
