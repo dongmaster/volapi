@@ -6,8 +6,15 @@ defmodule Volapi.Client.Sender do
   @doc """
   Generic function for sending frames using the Volapi.WebSocket.Server
   """
-  def gen_send(frame, room) do
-    {:ok, data} = gen_build(frame, room) |> Poison.encode
+  def gen_queue(frame, room) do
+    Volapi.Queue.Messages.add_message(gen_build(frame, room), room)
+  end
+
+  def gen_send([], _room) do
+  end
+
+  def gen_send(frames, room) do
+    {:ok, data} = gen_build_final(frames |> Enum.reverse(), room) |> Poison.encode
 
     Volapi.WebSocket.Server.reply(data, room)
   end
@@ -27,9 +34,16 @@ defmodule Volapi.Client.Sender do
   Be wary when using this so you don't set a wrong client_ack.
   """
   def gen_build(frame, client_ack_offset, room) do
-    server_ack = Volapi.Server.Client.get_ack(:server, room)
+    # server_ack = Volapi.Server.Client.get_ack(:server, room)
     client_ack = Volapi.Server.Client.get_ack(:client, room) + client_ack_offset
-    [server_ack, [[0, frame], client_ack]]
+    Volapi.Server.Client.set_ack(:client, client_ack + 1, room)
+    #[server_ack, [[0, frame], client_ack]]
+    [[0, frame], client_ack]
+  end
+
+  def gen_build_final(frames, room) do
+    server_ack = Volapi.Server.Client.get_ack(:server, room)
+    [server_ack | frames]
   end
 
   @doc """
@@ -46,7 +60,7 @@ defmodule Volapi.Client.Sender do
 
     frame = ["subscribe", %{"nick" => nick, "room" => room, "checksum" => checksum, "checksum2" => checksum}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def send_message(message, room) do
@@ -59,7 +73,7 @@ defmodule Volapi.Client.Sender do
 
     frame = ["call", %{"fn" => "command", "args" => [nick, "me", message]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def send_message(message, :admin, room) do
@@ -67,19 +81,19 @@ defmodule Volapi.Client.Sender do
 
     frame = ["call", %{"fn" => "command", "args" => [nick, "a", message]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def send_message(message, nick, room) do
     frame = ["call", %{"args" => [nick, message], "fn" => "chat"}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def login(session, room) do
     frame = ["call", %{"fn" => "useSession", "args" => [session]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def timeout_chat(id, nick, :short, room) do
@@ -107,7 +121,7 @@ defmodule Volapi.Client.Sender do
   def timeout_chat(id, nick, seconds, room) do
     frame = ["call", %{"fn" => "timeoutChat", "args" => [id, nick, seconds]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
 
@@ -134,7 +148,7 @@ defmodule Volapi.Client.Sender do
   def timeout_file(id, nick, seconds, room) do
     frame = ["call", %{"fn" => "timeoutFile", "args" => [id, nick, seconds]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   @doc """
@@ -143,24 +157,24 @@ defmodule Volapi.Client.Sender do
   def get_timeouts(room) do
     frame = ["call", %{"fn" => "requestTimeoutList", "args" => []}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def ban_user(ip, ban_opts, room) do
     frame = ["call", %{"fn" => "banUser", "args" => [ip, ban_opts]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def unban_user(ip, ban_opts, room) do
     frame = ["call", %{"fn" => "unbanUser", "args" => [ip, ban_opts]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 
   def delete_file(file_id, room) do
     frame = ["call", %{"fn" => "deleteFiles", "args" => [[file_id]]}]
 
-    gen_send(frame, room)
+    gen_queue(frame, room)
   end
 end

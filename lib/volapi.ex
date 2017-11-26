@@ -21,6 +21,7 @@ defmodule Volapi do
     children = [
       #worker(Volapi.Server, []),
       #worker(Volapi.WebSocket.Server, [url]),
+      supervisor(Volapi.Queue.Messages.Supervisor, []),
       supervisor(Volapi.Server.Supervisor, []),
       supervisor(Volapi.WebSocket.Supervisor, []),
       supervisor(Volapi.KeepAlive.Supervisor, []),

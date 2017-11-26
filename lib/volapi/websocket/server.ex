@@ -45,19 +45,11 @@ defmodule Volapi.WebSocket.Server do
     :ok
   end
 
-  # Don't know which one is best for piping so I'm just creating a reverse function.
-  # rreply means reverse reply
-  def rreply(room, data) do
-    reply(room, data)
-  end
-
   def generate_wss_url(volafile_wss_url, room) do
     rn = Volapi.Util.random_id(10)
     t = Volapi.Util.random_id(7)
     cs = Volapi.Util.get_checksum(room)
     nick = Application.get_env(:volapi, :nick)
-
-    IO.inspect cs
 
     EEx.eval_string(volafile_wss_url, [rn: rn, t: t, cs: cs, nick: nick, room: room])
   end
