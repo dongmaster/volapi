@@ -212,6 +212,25 @@ defmodule Volapi.Module do
     end
   end
 
+  defmacro handle("config", do: body) do
+    quote do
+      def handle_cast({:config, var!(message)}, state) do
+        on_message(var!(message))
+        unquote(body)
+        {:noreply, state}
+      end
+    end
+  end
+
+  defmacro handle("config_raw", do: body) do
+    quote do
+      def handle_cast({:config_raw, var!(message)}, state) do
+        on_message(var!(message))
+        unquote(body)
+        {:noreply, state}
+      end
+    end
+  end
 
   @doc """
   Defines a matcher which always calls its corresponding

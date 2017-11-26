@@ -118,6 +118,84 @@ defmodule Volapi.Client.Receiver do
     parse(t, room)
   end
 
+  def parse([[[_, ["config",
+                   %{
+                     "cdn_domain" => cdn_domain,
+                     "chat_max_alias_length" => chat_max_alias_length,
+                     "chat_max_history" => chat_max_history,
+                     "chat_max_message_length" => chat_max_message_length,
+                     "checksum2" => checksum2,
+                     "created_time" => created_time,
+                     "dmca_mail" => dmca_mail,
+                     "download_cookie_lifetime" => download_cookie_lifetime,
+                     "file_max_size" => file_max_size,
+                     "file_time_to_live" => file_time_to_live,
+                     "max_ban_message_length" => max_ban_message_length,
+                     "max_concurrent_uploads" => max_concurrent_uploads,
+                     "max_custom_room_id_length" => max_custom_room_id_length,
+                     "max_report_text_length" => max_report_text_length,
+                     "max_room_name_length" => max_room_name_length,
+                     "name" => name,
+                     "owner" => owner,
+                     "private" => private,
+                     "pro_reward_min_room_age" => pro_reward_min_room_age,
+                     "room_disabled_redirect_timeout" => room_disabled_redirect_timeout,
+                     "round_up_threshold" => round_up_threshold,
+                     "session_lifetime" => session_lifetime,
+                     "site" => site,
+                     "sitename" => sitename,
+                     "title_append" => title_append,
+                     "ui_enable_gallery" => ui_enable_gallery,
+                     "ui_gallery_buttons_hide_timeout" => ui_gallery_buttons_hide_timeout,
+                     "ui_gallery_honor_filter" => ui_gallery_honor_filter,
+                     "ui_gallery_title_hide_timeout" => ui_gallery_title_hide_timeout,
+                     "ui_tooltip_show_delay" => ui_tooltip_show_delay
+                   } = config]], server_ack] | t], room) do
+    Volapi.Server.Util.cast(:config, %Volapi.Message.Config
+      {
+        cdn_domain: cdn_domain,
+        chat_max_alias_length: chat_max_alias_length,
+        chat_max_history: chat_max_history,
+        chat_max_message_length: chat_max_message_length,
+        checksum2: checksum2,
+        created_time: created_time,
+        dmca_mail: dmca_mail,
+        download_cookie_lifetime: download_cookie_lifetime,
+        file_max_size: file_max_size,
+        file_time_to_live: file_time_to_live,
+        max_ban_message_length: max_ban_message_length,
+        max_concurrent_uploads: max_concurrent_uploads,
+        max_custom_room_id_length: max_custom_room_id_length,
+        max_report_text_length: max_report_text_length,
+        max_room_name_length: max_room_name_length,
+        name: name,
+        owner: owner,
+        private: private,
+        pro_reward_min_room_age: pro_reward_min_room_age,
+        room_disabled_redirect_timeout: room_disabled_redirect_timeout,
+        round_up_threshold: round_up_threshold,
+        session_lifetime: session_lifetime,
+        site: site,
+        sitename: sitename,
+        title_append: title_append,
+        ui_enable_gallery: ui_enable_gallery,
+        ui_gallery_buttons_hide_timeout: ui_gallery_buttons_hide_timeout,
+        ui_gallery_honor_filter: ui_gallery_honor_filter,
+        ui_gallery_title_hide_timeout: ui_gallery_title_hide_timeout,
+        ui_tooltip_show_delay: ui_tooltip_show_delay,
+        room: room,
+      })
+    Volapi.Server.Client.set_config(:owner, owner, room)
+    Volapi.Server.Client.set_config(:name, name, room)
+
+    parse(t, room)
+  end
+
+  def parse([[[_, ["config", config]], server_ack] | t], room) do
+    Volapi.Server.Util.cast(:config_raw, Map.put(config, :room, room))
+    parse(t, room)
+  end
+
   def parse([[[_, ["owner", %{"owner" => owner}]], server_ack] | t], room) do
     Volapi.Server.Util.cast(:is_owner, owner)
     parse(t, room)
